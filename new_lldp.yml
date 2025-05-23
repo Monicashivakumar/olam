@@ -1,40 +1,57 @@
 ---
-- name: Get LLDP interface info and save to CSV
+- name: Parse LLDP interfaces and write to CSV
   hosts: all
   become: true
-  gather_facts: no
+  gather_facts: false
 
   vars:
     csv_file_path: "/tmp/{{ inventory_hostname }}_lldp_interfaces.csv"
 
   tasks:
-    - name: Get LLDP interfaces info (JSON)
+    - name: Ensure lldpd is installed
+      package:
+        name: lldpd
+        state: present
+
+    - name: Ensure lldpd service is started and enabled
+      service:
+        name: lldpd
+        state: started
+        enabled: true
+
+    - name: Get LLDP interfaces info in JSON
       command: lldpcli show interfaces -f json
       register: lldp_interfaces
       changed_when: false
 
-    - name: Parse LLDP interfaces dictionary
+    - name: Parse and flatten LLDP interface data
       set_fact:
-        interfaces: "{{ (lldp_interfaces.stdout | from_json).lldp.interface | default({}) }}"
+        flat_interfaces: >-
+          {{
+            (lldp_interfaces.stdout | from_json).lldp.interface
+            | map('dict2items') | map('first') | list
+          }}
 
     - name: Write CSV header
       copy:
         dest: "{{ csv_file_path }}"
-        content: "Host,Interface Name,Chassis Hostname,Chassis MAC,Description,Port ID,Capabilities\n"
+        content: "Host,Interface,Chassis Name,MAC Address,Description,Port ID,Capabilities\n"
       delegate_to: localhost
 
-    - name: Append LLDP interface data to CSV
+    - name: Append LLDP data to CSV
       delegate_to: localhost
       lineinfile:
         path: "{{ csv_file_path }}"
         line: >-
           {{ inventory_hostname }},
           {{ item.key }},
-          {{ (item.value.chassis | dict2items | first).key | default('N/A') }},
-          {{ (item.value.chassis | dict2items | first).value.id.value | default('N/A') }},
-          {{ (item.value.chassis | dict2items | first).value.descr | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['key'] | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['value']['id']['value'] | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['value']['descr'] | default('N/A') }},
           {{ item.value.port.id.value | default('N/A') }},
-          {{ (item.value.chassis | dict2items | first).value.capability | map(attribute='type') | join(';') if (item.value.chassis | dict2items | first).value.capability is defined else 'N/A' }}
+          {{ (item.value.chassis | dict2items)[0]['value']['capability'] | map(attribute='type') | join(';') if (item.value.chassis | dict2items)[0]['value']['capability'] is defined else 'N/A' }}
         insertafter: EOF
-      loop: "{{ interfaces | dict2items }}"
+      loop: "{{ flat_interfaces }}"
+
+
 
