@@ -7,11 +7,48 @@
   tasks:
 
 
-    - name: Get LLDP neighbors in JSON format
-      command: /usr/sbin/lldpcli show neighbors -f json
-      register: lldp_neighbors
+    - name: Ensure lldpd is installed
+      package:
+        name: lldpd
+        state: present
+
+    - name: Ensure lldpd service is started and enabled
+      service:
+        name: lldpd
+        state: started
+        enabled: true
+
+    - name: Get LLDP interfaces info in JSON
+      command: lldpcli show interfaces -f json
+      register: lldp_interfaces
       changed_when: false
 
-    - name: Show LLDP neighbor raw info
-      debug:
-        var: lldp_neighbors.stdout
+    - name: Parse and flatten LLDP interface data
+      set_fact:
+        flat_interfaces: >-
+          {{
+            (lldp_interfaces.stdout | from_json).lldp.interface
+            | map('dict2items') | map('first') | list
+          }}
+
+    - name: Write CSV header
+      copy:
+        dest: "{{ csv_file_path }}"
+        content: "Host,Interface,Chassis Name,MAC Address,Description,Port ID,Capabilities\n"
+      delegate_to: localhost
+
+    - name: Append LLDP data to CSV
+      delegate_to: localhost
+      lineinfile:
+        path: "{{ csv_file_path }}"
+        line: >-
+          {{ inventory_hostname }},
+          {{ item.key }},
+          {{ (item.value.chassis | dict2items)[0]['key'] | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['value']['id']['value'] | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['value']['descr'] | default('N/A') }},
+          {{ item.value.port.id.value | default('N/A') }},
+          {{ (item.value.chassis | dict2items)[0]['value']['capability'] | map(attribute='type') | join(';') if (item.value.chassis | dict2items)[0]['value']['capability'] is defined else 'N/A' }}
+        insertafter: EOF
+      loop: "{{ flat_interfaces }}"
+
