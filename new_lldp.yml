@@ -1,6 +1,6 @@
 ---
 - name: Get LLDP interface info and save to CSV
-  hosts: localhost
+  hosts: all
   become: true
   gather_facts: no
 
