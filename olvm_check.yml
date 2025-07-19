@@ -52,6 +52,7 @@
       src: /test/report.html
       dest: /test/report.html
       flat: yes
+    delegate_to: localhost
 
   - name: sleep
     wait_for:
