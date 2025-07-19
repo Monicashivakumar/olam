@@ -18,4 +18,37 @@
       tags:
         - always
 
+
+  - name: Get number of KVM hosts
+    ovirt_host_info:
+      auth: "{{ auth.ovirt_auth }}"
+      fetch_nested: true
+    register: hosts_info
+
+  - name: Get number of storage domains
+    ovirt_storage_domain_info:
+      auth: "{{ auth.ovirt_auth }}"
+      fetch_nested: true
+    register: storage_domains_info
+
+  - name: Get number of VMs
+    ovirt_vm_info:
+      auth: "{{ auth.ovirt_auth }}"
+      fetch_nested: true
+    register: vms_info
+
+  - name: Generate HTML report
+    template:
+      src: templates/report.html.j2
+      dest: /path/to/output/report.html
+      mode: '0644'
+    vars:
+      num_hosts: "{{ hosts_info.ovirt_hosts | length }}"
+      num_storage_domains: "{{ storage_domains_info.ovirt_storage_domains | length }}"
+      num_vms: "{{ vms_info.ovirt_vms | length }}"
+
+  - name: Logout from OLVM
+    ovirt_auth:
+      state: absent
+      ovirt_auth: "{{ auth.ovirt_auth }}"
     
