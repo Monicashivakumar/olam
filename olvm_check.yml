@@ -51,7 +51,7 @@
     fetch:
       src: /test/report.html
       dest: /path/on/control/node/
-    flat: yes
+      flat: yes
 
   - name: sleep
     wait_for:
