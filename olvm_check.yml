@@ -42,6 +42,7 @@
       src: templates/report.html.j2
       dest: /test/report.html
       mode: '0644'
+    delegate_to: localhost  
     vars:
       num_hosts: "{{ hosts_info.ovirt_hosts | length }}"
       num_storage_domains: "{{ storage_domains_info.ovirt_storage_domains | length }}"
