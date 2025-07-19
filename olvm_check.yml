@@ -50,7 +50,7 @@
   - name: Fetch HTML report
     fetch:
       src: /test/report.html
-      dest: /path/on/control/node/
+      dest: /test/report.html
       flat: yes
 
   - name: sleep
