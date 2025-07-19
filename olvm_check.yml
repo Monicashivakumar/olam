@@ -47,6 +47,10 @@
       num_storage_domains: "{{ storage_domains_info.ovirt_storage_domains | length }}"
       num_vms: "{{ vms_info.ovirt_vms | length }}"
 
+  - name: sleep
+    wait_for:
+      timeout: 300
+
   - name: Logout from OLVM
     ovirt_auth:
       state: absent
