@@ -47,6 +47,12 @@
       num_storage_domains: "{{ storage_domains_info.ovirt_storage_domains | length }}"
       num_vms: "{{ vms_info.ovirt_vms | length }}"
 
+  - name: Fetch HTML report
+    fetch:
+      src: /test/report.html
+      dest: /path/on/control/node/
+    flat: yes
+
   - name: sleep
     wait_for:
       timeout: 300
