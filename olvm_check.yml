@@ -21,19 +21,19 @@
 
   - name: Get number of KVM hosts
     ovirt_host_info:
-      auth: "{{ auth.ovirt_auth }}"
+      auth: "{{ ovirt_auth }}"
       fetch_nested: true
     register: hosts_info
 
   - name: Get number of storage domains
     ovirt_storage_domain_info:
-      auth: "{{ auth.ovirt_auth }}"
+      auth: "{{ ovirt_auth }}"
       fetch_nested: true
     register: storage_domains_info
 
   - name: Get number of VMs
     ovirt_vm_info:
-      auth: "{{ auth.ovirt_auth }}"
+      auth: "{{ ovirt_auth }}"
       fetch_nested: true
     register: vms_info
 
@@ -50,5 +50,5 @@
   - name: Logout from OLVM
     ovirt_auth:
       state: absent
-      ovirt_auth: "{{ auth.ovirt_auth }}"
+      ovirt_auth: "{{ ovirt_auth }}"
     
