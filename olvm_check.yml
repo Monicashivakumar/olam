@@ -54,10 +54,6 @@
       flat: yes
     delegate_to: localhost
 
-  - name: sleep
-    wait_for:
-      timeout: 300
-
   - name: Logout from OLVM
     ovirt_auth:
       state: absent
