@@ -12,7 +12,6 @@
 <body>
     <h1>oVirt Environment Report</h1>
 
-    <h2>Summary</h2>
     <table>
         <tr>
             <th>Category</th>
@@ -20,59 +19,16 @@
         </tr>
         <tr>
             <td>KVM Hosts</td>
-            <td>{{ num_hosts }}</td>
+            <td>{{ hosts_info.ovirt_hosts | length }}</td>
         </tr>
         <tr>
             <td>Storage Domains</td>
-            <td>{{ num_storage_domains }}</td>
+            <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
         </tr>
         <tr>
             <td>Virtual Machines</td>
-            <td>{{ num_vms }}</td>
+            <td>{{ vms_info.ovirt_vms | length }}</td>
         </tr>
-    </table>
-
-    <h2>Detailed Information</h2>
-    <h3>KVM Hosts</h3>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-        </tr>
-        {% for host in hosts_info.ovirt_hosts %}
-        <tr>
-            <td>{{ host.name }}</td>
-            <td>{{ host.status }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <h3>Storage Domains</h3>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-        </tr>
-        {% for sd in storage_domains_info.ovirt_storage_domains %}
-        <tr>
-            <td>{{ sd.name }}</td>
-            <td>{{ sd.status }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <h3>Virtual Machines</h3>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-        </tr>
-        {% for vm in vms_info.ovirt_vms %}
-        <tr>
-            <td>{{ vm.name }}</td>
-            <td>{{ vm.status }}</td>
-        </tr>
-        {% endfor %}
     </table>
 </body>
 </html>
