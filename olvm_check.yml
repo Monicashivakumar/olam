@@ -52,9 +52,6 @@
         set_fact:
           hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
       
-      - name: Get number of VMs created in the last month
-        set_fact:
-          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', 'regex', '^' + (ansible_date_time.date - 30 | string)) | list | length }}"
       
       - name: Generate HTML report
         template:
