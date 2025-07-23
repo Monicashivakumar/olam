@@ -1,12 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OLVM Report</title>
+    <title>{{ report_title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f0f0f0; }
+    </style>
 </head>
 <body>
-    <h1>OLVM Environment Report</h1>
-    <p>Number of KVM Hosts: {{ num_hosts }}</p>
-    <p>Number of Storage Domains: {{ num_storage_domains }}</p>
-    <p>Number of VMs: {{ num_vms }}</p>
+    <h1>{{ report_title }}</h1>
+
+    <h2>Virtual Machines</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>CPU</th>
+            <th>Memory</th>
+        </tr>
+        {% for vm in vms %}
+        <tr>
+            <td>{{ vm.name }}</td>
+            <td>{{ vm.status }}</td>
+            <td>{{ vm.cpu.cores * vm.cpu.sockets }}</td>
+            <td>{{ vm.memory / (1024*1024*1024) }} GB</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Hosts</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Number of VMs</th>
+        </tr>
+        {% for host in hosts %}
+        <tr>
+            <td>{{ host.name }}</td>
+            <td>{{ host.status }}</td>
+            <td>{{ host.summary.active }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Storage Domains</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Available Space</th>
+        </tr>
+        {% for sd in storage_domains %}
+        <tr>
+            <td>{{ sd.name }}</td>
+            <td>{{ sd.status }}</td>
+            <td>{{ sd.available / (1024*1024*1024) }} GB</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
