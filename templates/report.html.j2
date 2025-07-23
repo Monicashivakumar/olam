@@ -22,12 +22,28 @@
             <td>{{ hosts_info.ovirt_hosts | length }}</td>
         </tr>
         <tr>
+            <td>Hosts in Maintenance</td>
+            <td>{{ hosts_in_maintenance }}</td>
+        </tr>
+        <tr>
             <td>Storage Domains</td>
             <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
         </tr>
         <tr>
+            <td>Clusters</td>
+            <td>{{ clusters_info.ovirt_clusters | length }}</td>
+        </tr>
+        <tr>
+            <td>Templates</td>
+            <td>{{ templates_info.ovirt_templates | length }}</td>
+        </tr>
+        <tr>
             <td>Virtual Machines</td>
             <td>{{ vms_info.ovirt_vms | length }}</td>
+        </tr>
+        <tr>
+            <td>VMs Created Last Month</td>
+            <td>{{ vms_created_last_month }}</td>
         </tr>
     </table>
 </body>
