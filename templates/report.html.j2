@@ -1,16 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>oVirt Environment Report</title>
+    <title>Oracle Linux Virtualization Manager Report</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f0f0f0; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        table {
+            border-collapse: collapse;
+            background-color: #ffffff;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #005ca6;
+            color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            color: #005ca6;
+        }
     </style>
 </head>
 <body>
-    <h1>oVirt Environment Report</h1>
+    <h1>Oracle Linux Virtualization Manager Report</h1>
 
     <table>
         <tr>
@@ -25,7 +43,7 @@
             <td>Hosts in Maintenance</td>
             <td>{{ hosts_in_maintenance }}</td>
         </tr>
-        tr>
+        <tr>
             <td>Hosts Non Responsive</td>
             <td>{{ hosts_non_responsive }}</td>
         </tr>
@@ -49,7 +67,7 @@
             <td>Virtual Machines</td>
             <td>{{ vms_info.ovirt_vms | length }}</td>
         </tr>
-       
+    
     </table>
 </body>
 </html>
