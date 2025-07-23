@@ -52,7 +52,6 @@
       src: /etc/pki/ca-trust/report.html
       dest: /etc/pki/ca-trust/report.html
       flat: yes
-    delegate_to: localhost
 
   - name: Logout from OLVM
     ovirt_auth:
