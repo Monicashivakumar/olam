@@ -51,6 +51,14 @@
       - name: Get number of hosts in maintenance state
         set_fact:
           hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
+
+      - name: Get number of hosts in non responsive state
+        set_fact:
+          hosts_non_responsive: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | list | length }}"
+
+      - name: Get number of hosts in non operational state
+        set_fact:
+          hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
       
       
       - name: Generate HTML report
