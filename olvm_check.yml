@@ -46,6 +46,9 @@
       num_hosts: "{{ hosts_info.ovirt_hosts | length }}"
       num_storage_domains: "{{ storage_domains_info.ovirt_storage_domains | length }}"
       num_vms: "{{ vms_info.ovirt_vms | length }}"
+      hosts_info: "{{ hosts_info }}"
+      storage_domains_info: "{{ storage_domains_info }}"
+      vms_info: "{{ vms_info }}"
 
   - name: Fetch HTML report
     fetch:
