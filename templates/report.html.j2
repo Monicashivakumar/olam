@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ report_title }}</title>
+    <title>oVirt Environment Report</title>
     <style>
         body { font-family: Arial, sans-serif; }
         table { border-collapse: collapse; }
@@ -10,54 +10,67 @@
     </style>
 </head>
 <body>
-    <h1>{{ report_title }}</h1>
+    <h1>oVirt Environment Report</h1>
 
-    <h2>Virtual Machines</h2>
+    <h2>Summary</h2>
     <table>
         <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>CPU</th>
-            <th>Memory</th>
+            <th>Category</th>
+            <th>Count</th>
         </tr>
-        {% for vm in vms %}
         <tr>
-            <td>{{ vm.name }}</td>
-            <td>{{ vm.status }}</td>
-            <td>{{ vm.cpu.cores * vm.cpu.sockets }}</td>
-            <td>{{ vm.memory / (1024*1024*1024) }} GB</td>
+            <td>KVM Hosts</td>
+            <td>{{ num_hosts }}</td>
         </tr>
-        {% endfor %}
+        <tr>
+            <td>Storage Domains</td>
+            <td>{{ num_storage_domains }}</td>
+        </tr>
+        <tr>
+            <td>Virtual Machines</td>
+            <td>{{ num_vms }}</td>
+        </tr>
     </table>
 
-    <h2>Hosts</h2>
+    <h2>Detailed Information</h2>
+    <h3>KVM Hosts</h3>
     <table>
         <tr>
             <th>Name</th>
             <th>Status</th>
-            <th>Number of VMs</th>
         </tr>
-        {% for host in hosts %}
+        {% for host in hosts_info.ovirt_hosts %}
         <tr>
             <td>{{ host.name }}</td>
             <td>{{ host.status }}</td>
-            <td>{{ host.summary.active }}</td>
         </tr>
         {% endfor %}
     </table>
 
-    <h2>Storage Domains</h2>
+    <h3>Storage Domains</h3>
     <table>
         <tr>
             <th>Name</th>
             <th>Status</th>
-            <th>Available Space</th>
         </tr>
-        {% for sd in storage_domains %}
+        {% for sd in storage_domains_info.ovirt_storage_domains %}
         <tr>
             <td>{{ sd.name }}</td>
             <td>{{ sd.status }}</td>
-            <td>{{ sd.available / (1024*1024*1024) }} GB</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Virtual Machines</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+        </tr>
+        {% for vm in vms_info.ovirt_vms %}
+        <tr>
+            <td>{{ vm.name }}</td>
+            <td>{{ vm.status }}</td>
         </tr>
         {% endfor %}
     </table>
