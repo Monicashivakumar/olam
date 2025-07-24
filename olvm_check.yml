@@ -18,61 +18,75 @@
         tags:
           - always
           
+
       - name: Get number of KVM hosts
         ovirt_host_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: hosts_info
-  
+    
       - name: Get number of storage domains
         ovirt_storage_domain_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: storage_domains_info
-      
+    
       - name: Get number of VMs
         ovirt_vm_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: vms_info
-      
+    
       - name: Get number of clusters
         ovirt_cluster_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: clusters_info
-      
+    
       - name: Get number of templates
         ovirt_template_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: templates_info
-      
+    
       - name: Get number of hosts in maintenance state
         set_fact:
           hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
-      
+    
       - name: Get number of hosts in non responsive state
         set_fact:
           hosts_non_responsive: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | list | length }}"
-      
+    
       - name: Get number of hosts in non operational state
         set_fact:
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
     
-      
-      - name: Get number of VMs
-        ovirt_vm_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-        register: vms_info
-      
-      
+      - name: Get number of VMs created in the last month
+        set_fact:
+          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (ansible_date_time.epoch | int - 2592000) | to_datetime) | list | length }}"
+    
+      - name: Count VMs with high CPU utilization
+        set_fact:
+          vms_high_cpu_utilization: 0
+    
+      - name: Count VMs with high CPU utilization
+        set_fact:
+          vms_high_cpu_utilization: "{{ vms_high_cpu_utilization + 1 }}"
+        loop: "{{ vms_info.ovirt_vms }}"
+        when:
+          - item.statistics is defined
+          - item.statistics | selectattr('name', 'equalto', 'cpu.current.usage') | list | length > 0
+          - (item.statistics | selectattr('name', 'equalto', 'cpu.current.usage') | map(attribute='value') | list | first | int) > 90
+    
+      - name: Get clusters with compatibility version 4.7
+        set_fact:
+          clusters_47: "{{ clusters_info.ovirt_clusters | selectattr('version.major', 'equalto', 4) | selectattr('version.minor', 'equalto', 7) | list }}"
+    
       - name: Generate HTML report
         template:
           src: templates/report.html.j2
           dest: /etc/pki/ca-trust/report.html
-          mode: '0644'  
+          mode: '0644'
         vars:
           hosts_info: "{{ hosts_info }}"
           storage_domains_info: "{{ storage_domains_info }}"
@@ -84,3 +98,9 @@
           hosts_non_operational: "{{ hosts_non_operational }}"
           vms_created_last_month: "{{ vms_created_last_month }}"
           vms_high_cpu_utilization: "{{ vms_high_cpu_utilization }}"
+          clusters_47: "{{ clusters_47 }}"
+    
+      - name: Logout from OLVM
+        ovirt_auth:
+          state: absent
+          ovirt_auth: "{{ ovirt_auth }}"
