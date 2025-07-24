@@ -15,15 +15,24 @@
         a:hover {
             color: #337ab7;
         }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
         .section {
             margin: 20px;
             padding: 20px;
             background-color: #ffffff;
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .section h2 {
-            margin-top: 0;
         }
         .logo {
             text-align: center;
@@ -40,11 +49,11 @@
 </head>
 <body>
     <div class="logo">
-        <img src="fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
+        <img src="/usr/share/oracle-logos/fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
     </div>
 
     <div class="section">
-        <h3><a onclick="toggleSection('general-info')"> General Info about the Environment</a></h3>
+        <h3><a onclick="toggleSection('general-info')">General Info about the Environment</a></h3>
         <div id="general-info" class="hidden">
             <table>
                 <tr>
@@ -83,9 +92,10 @@
                     <td>Virtual Machines</td>
                     <td>{{ vms_info.ovirt_vms | length }}</td>
                 </tr>
+
             </table>
         </div>
-        <h3><a onclick="toggleSection('cluster-info')">Cluster Information</a></h3>
+        <h3><a onclick="toggleSection('cluster-info')">2. Cluster Information</a></h3>
         <div id="cluster-info" class="hidden">
             <!-- Add cluster information here -->
         </div>
