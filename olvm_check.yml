@@ -67,9 +67,6 @@
           fetch_nested: true
         register: vms_info
       
-      - name: Get number of VMs with CPU utilization over 90%
-        set_fact:
-          vms_high_cpu_utilization: "{{ vms_info.ovirt_vms | selectattr('statistics', 'defined') | selectattr('statistics.cpu.current.usage', 'gt', 90) | list | length }}"
       
       - name: Generate HTML report
         template:
