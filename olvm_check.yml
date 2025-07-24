@@ -61,15 +61,15 @@
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
     
       
-      - name: Get VM statistics
+      - name: Get number of VMs
         ovirt_vm_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
-        register: vm_stats_info
+        register: vms_info
       
       - name: Get number of VMs with CPU utilization over 90%
         set_fact:
-          vms_high_cpu_utilization: "{{ vm_stats_info.ovirt_vm_stats | selectattr('cpu.current.guest', 'gt', 90) | list | length }}"
+          vms_high_cpu_utilization: "{{ vms_info.ovirt_vms | selectattr('statistics', 'defined') | selectattr('statistics.cpu.current.usage', 'gt', 90) | list | length }}"
       
       - name: Generate HTML report
         template:
