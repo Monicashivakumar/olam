@@ -62,7 +62,7 @@
     
       
       - name: Get VM statistics
-        ovirt_vm_stat_info:
+        ovirt_vm_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: vm_stats_info
