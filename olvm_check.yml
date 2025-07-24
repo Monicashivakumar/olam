@@ -23,7 +23,7 @@
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
         register: hosts_info
-      
+  
       - name: Get number of storage domains
         ovirt_storage_domain_info:
           auth: "{{ ovirt_auth }}"
@@ -51,15 +51,28 @@
       - name: Get number of hosts in maintenance state
         set_fact:
           hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
-
+      
       - name: Get number of hosts in non responsive state
         set_fact:
           hosts_non_responsive: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | list | length }}"
-
+      
       - name: Get number of hosts in non operational state
         set_fact:
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
       
+      - name: Get number of VMs created in the last month
+        set_fact:
+          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (ansible_date_time.epoch | int - 2592000) | to_datetime) | list | length }}"
+      
+      - name: Get VM statistics
+        ovirt_vm_stat_info:
+          auth: "{{ ovirt_auth }}"
+          fetch_nested: true
+        register: vm_stats_info
+      
+      - name: Get number of VMs with CPU utilization over 90%
+        set_fact:
+          vms_high_cpu_utilization: "{{ vm_stats_info.ovirt_vm_stats | selectattr('cpu.current.guest', 'gt', 90) | list | length }}"
       
       - name: Generate HTML report
         template:
@@ -73,4 +86,7 @@
           clusters_info: "{{ clusters_info }}"
           templates_info: "{{ templates_info }}"
           hosts_in_maintenance: "{{ hosts_in_maintenance }}"
+          hosts_non_responsive: "{{ hosts_non_responsive }}"
+          hosts_non_operational: "{{ hosts_non_operational }}"
           vms_created_last_month: "{{ vms_created_last_month }}"
+          vms_high_cpu_utilization: "{{ vms_high_cpu_utilization }}"
