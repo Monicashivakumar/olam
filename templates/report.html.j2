@@ -10,6 +10,7 @@
         a {
             text-decoration: none;
             color: #005ca6;
+            cursor: pointer;
         }
         a:hover {
             color: #337ab7;
@@ -39,24 +40,63 @@
 </head>
 <body>
     <div class="logo">
-        <img src="file:///usr/share/oracle-logos/fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
+        <img src="/usr/share/oracle-logos/fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
     </div>
 
     <div class="section">
-        <h2><a href="#general-info" onclick="toggleSection('general-info')">1. General Info about the Environment</a></h2>
-        <h2><a href="#cluster-info" onclick="toggleSection('cluster-info')">2. Cluster Information</a></h2>
-    </div>
-
-    <div id="general-info" class="section hidden">
-        <h2>General Info about the Environment</h2>
-        <table>
-            <!-- Your table content here -->
-        </table>
-    </div>
-
-    <div id="cluster-info" class="section hidden">
-        <h2>Cluster Information</h2>
-        <!-- Add cluster information here -->
+        <h2><a onclick="toggleSection('general-info')">1. General Info about the Environment</a></h2>
+        <div id="general-info" class="hidden">
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                </tr>
+                <tr>
+                    <td>KVM Hosts</td>
+                    <td>{{ hosts_info.ovirt_hosts | length }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts in Maintenance</td>
+                    <td>{{ hosts_in_maintenance }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts Non Responsive</td>
+                    <td>{{ hosts_non_responsive }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts Non Operational</td>
+                    <td>{{ hosts_non_operational }}</td>
+                </tr>
+                <tr>
+                    <td>Storage Domains</td>
+                    <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
+                </tr>
+                <tr>
+                    <td>Clusters</td>
+                    <td>{{ clusters_info.ovirt_clusters | length }}</td>
+                </tr>
+                <tr>
+                    <td>Templates</td>
+                    <td>{{ templates_info.ovirt_templates | length }}</td>
+                </tr>
+                <tr>
+                    <td>Virtual Machines</td>
+                    <td>{{ vms_info.ovirt_vms | length }}</td>
+                </tr>
+                <tr>
+                    <td>VMs Created Last Month</td>
+                    <td>{{ vms_created_last_month }}</td>
+                </tr>
+                <tr>
+                    <td>VMs with High CPU Utilization (> 90%)</td>
+                    <td>{{ vms_high_cpu_utilization }}</td>
+                </tr>
+            </table>
+        </div>
+        <h2><a onclick="toggleSection('cluster-info')">2. Cluster Information</a></h2>
+        <div id="cluster-info" class="hidden">
+            <!-- Add cluster information here -->
+        </div>
     </div>
 
     <script>
