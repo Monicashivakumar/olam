@@ -59,10 +59,7 @@
       - name: Get number of hosts in non operational state
         set_fact:
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
-      
-      - name: Get number of VMs created in the last month
-        set_fact:
-          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (ansible_date_time.epoch | int - 2592000) | to_datetime) | list | length }}"
+    
       
       - name: Get VM statistics
         ovirt_vm_stat_info:
