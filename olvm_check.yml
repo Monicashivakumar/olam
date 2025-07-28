@@ -72,7 +72,7 @@
 
       - name: Debug host.cpu
         debug:
-          msg: "{{ host.cpu }}"
+          msg: "{{ hosts_info }}"
     
       - name: Generate HTML report
         template:
