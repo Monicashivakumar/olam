@@ -119,12 +119,14 @@
             <table>
                 <tr>
                     <th>Name</th>
-                     <th>CPU Model</th>
+                    <th>CPU Model</th>
+                    <th>CPU Type </th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
                         <td>{{ host.name }}</td>
                         <td>{{ host.cpu.name }}</td>
+                        <td>{{ host.cpu.type | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
             </table>
