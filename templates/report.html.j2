@@ -130,7 +130,7 @@
                         <td>{{ host.cpu.name }}</td>
                         <td>{{ host.cpu.type | default('N/A') }}</td>
                         <td>{{ host.cpu.sockets | default('N/A') }}</td>
-                        <td>{{ host.cpu.vendor | default('N/A') }}</td>
+                        <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
             </table>
