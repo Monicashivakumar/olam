@@ -60,7 +60,11 @@
       - name: Get number of hosts in non operational state
         set_fact:
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
-  
+
+      - name: Count active and inactive VMs
+        set_fact:
+          active_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'up') | list | length }}"
+          inactive_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'down') | list | length }}"
     
       - name: Get clusters with compatibility version 4.7
         set_fact:
@@ -81,6 +85,8 @@
           hosts_non_responsive: "{{ hosts_non_responsive }}"
           hosts_non_operational: "{{ hosts_non_operational }}"
           clusters_47: "{{ clusters_47 }}"
+          active_vms: "{{ active_vms }}"
+          inactive_vms: "{{ inactive_vms }}"
 
     
       - name: Logout from OLVM
