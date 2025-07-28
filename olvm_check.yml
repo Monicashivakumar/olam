@@ -69,6 +69,10 @@
       - name: Get clusters with compatibility version 4.7
         set_fact:
           clusters_47: "{{ clusters_info.ovirt_clusters | selectattr('version.major', 'equalto', 4) | selectattr('version.minor', 'equalto', 7) | list }}"
+
+      - name: Debug host.cpu
+        debug:
+          msg: "{{ host.cpu }}"
     
       - name: Generate HTML report
         template:
