@@ -61,19 +61,6 @@
         set_fact:
           hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
   
-  
-      - name: Count VMs with high CPU utilization
-        set_fact:
-          vms_high_cpu_utilization: 0
-    
-      - name: Count VMs with high CPU utilization
-        set_fact:
-          vms_high_cpu_utilization: "{{ vms_high_cpu_utilization + 1 }}"
-        loop: "{{ vms_info.ovirt_vms }}"
-        when:
-          - item.statistics is defined
-          - item.statistics | selectattr('name', 'equalto', 'cpu.current.usage') | list | length > 0
-          - (item.statistics | selectattr('name', 'equalto', 'cpu.current.usage') | map(attribute='value') |< attribute='value') | list | first | int) > 90
     
       - name: Get clusters with compatibility version 4.7
         set_fact:
@@ -93,7 +80,6 @@
           hosts_in_maintenance: "{{ hosts_in_maintenance }}"
           hosts_non_responsive: "{{ hosts_non_responsive }}"
           hosts_non_operational: "{{ hosts_non_operational }}"
-          vms_high_cpu_utilization: "{{ vms_high_cpu_utilization }}"
           clusters_47: "{{ clusters_47 }}"
 
     
