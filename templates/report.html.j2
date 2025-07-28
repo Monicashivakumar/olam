@@ -121,16 +121,41 @@
                 <tr>
                     <th>Name</th>
                     <th>CPU Model</th>
+                    <th>CPU Type</th>
+                    <th>Number of CPUs</th>
+                    <th>Manufacturer</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
                     <td>{{ host.name }}</td>
                     <td>{{ host.cpu.name }}</td>
+                    {% if host.cpu is defined %}
+                        {% if 'type' is defined in host.cpu %}
+                            <td>{{ host.cpu.type }}</td>
+                        {% else %}
+                            <td>N/A</td>
+                        {% endif %}
+                        {% if 'sockets' is defined in host.cpu %}
+                            <td>{{ host.cpu.sockets }}</td>
+                        {% else %}
+                            <td>N/A</td>
+                        {% endif %}
+                        {% if 'vendor' is defined in host.cpu %}
+                            <td>{{ host.cpu.vendor }}</td>
+                        {% else %}
+                            <td>N/A</td>
+                        {% endif %}
+                    {% else %}
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
         </div>
     </div>
+
 
     <script>
         function toggleSection(id) {
