@@ -123,73 +123,73 @@
                 <tr>
                     <th>Name</th>
                     <th>CPU Model</th>
-                    <th>CPU Type </th>
-                    <th>Number of CPUs </th>
-                    <th>Manufacturer </th>
+                    <th>CPU Type</th>
+                    <th>Number of CPUs</th>
+                    <th>Manufacturer</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
                     <td>{{ host.name }}</td>
                     <td>{{ host.cpu.name }}</td>
                     <td>{{ host.cpu.type | default('N/A') }}</td>
-                    <td>{{ host.cpu.topology.cores| default('N/A') }}</td>
+                    <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
                     <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
             </table>
             {% if hosts_info.ovirt_hosts | selectattr('events', 'defined') | list | length > 0 %}
-                <h3>Critical Host Events</h3>
-                {% for host in hosts_info.ovirt_hosts %}
-                    {% if host.events is defined %}
-                        <h4>{{ host.name }}</h4>
-                        <table>
-                            <tr>
-                                <th>Event Type</th>
-                                <th>Description</th>
-                                <th>Time</th>
-                            </tr>
-                            {% for event in host.events %}
-                                {% if event.severity == 'error' or event.severity == 'alert' %}
-                                <tr>
-                                    <td>{{ event.severity }}</td>
-                                    <td>{{ event.description }}</td>
-                                    <td>{{ event.time | default('N/A') }}</td>
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </table>
-                    {% endif %}
+            <h3>Critical Host Events</h3>
+            {% for host in hosts_info.ovirt_hosts %}
+            {% if host.events is defined %}
+            <h4>{{ host.name }}</h4>
+            <table>
+                <tr>
+                    <th>Event Type</th>
+                    <th>Description</th>
+                    <th>Time</th>
+                </tr>
+                {% for event in host.events %}
+                {% if event.severity == 'error' or event.severity == 'alert' %}
+                <tr>
+                    <td>{{ event.severity }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.time | default('N/A') }}</td>
+                </tr>
+                {% endif %}
                 {% endfor %}
+            </table>
+            {% endif %}
+            {% endfor %}
             {% endif %}
             <h3>Critical Events</h3>
+            {% if events_info.ovirt_events is defined %}
             <table>
                 <tr>
                     <th>Description</th>
                     <th>Time</th>
                 </tr>
-                {% if events_info.ovirt_events is defined %}
-                    {% for event in events_info.ovirt_events | selectattr('severity', 'equalto', 'error') | sort(attribute='time', reverse=True) | list[:3] %}
-                    <tr>
-                        <td>{{ event.description }}</td>
-                        <td>{{ event.time }}</td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="2">No critical events found.</td>
-                    </tr>
-                {% endif %}
+                {% for event in events_info.ovirt_events | selectattr('severity', 'equalto', 'error') | sort(attribute='time', reverse=True) | list[:3] %}
+                <tr>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.time }}</td>
+                </tr>
+                {% endfor %}
             </table>
+            {% else %}
+            <p>No critical events found.</p>
+            {% endif %}
         </div>
     </div>
 
     <script>
         function toggleSection(id) {
             var section = document.getElementById(id);
-            if (section.classList.contains('hidden')) {
-                section.classList.remove('hidden');
-            } else {
-                section.classList.add('hidden');
+            if (section) {
+                if (section.classList.contains('hidden')) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
             }
         }
     </script>
