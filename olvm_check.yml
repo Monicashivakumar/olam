@@ -28,6 +28,11 @@
                 - cpu
                 - hardware_information
         register: hosts_info
+
+      - name: Get events
+        ovirt_event_info:
+          auth: "{{ ovirt_auth }}"
+        register: events_info
     
       - name: Get number of storage domains
         ovirt_storage_domain_info:
@@ -78,9 +83,10 @@
         debug:
           msg: "{{ hosts_info }}"
 
-      - name: Debug hosts_info
+      - name: Debug events_info
         debug:
-          msg: "{{ hosts_info.ovirt_hosts | map(attribute='name') | list }}"
+          msg: "{{ item }}"
+        loop: "{{ events_info.ovirt_events }}"
     
       - name: Generate HTML report
         template:
