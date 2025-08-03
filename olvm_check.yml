@@ -83,11 +83,6 @@
         debug:
           msg: "{{ hosts_info }}"
 
-      - name: Print latest 3 events with severity error
-        debug:
-          msg: "{{ item.description }} - {{ item.time }}"
-        loop: "{{ (events_info.ovirt_events | selectattr('severity', 'equalto', 'error') | sort(attribute='time', reverse=True) | list)[:3] }}"
-        when: events_info.ovirt_events | selectattr('severity', 'equalto', 'error') | list | length > 0
   
     
       - name: Generate HTML report
