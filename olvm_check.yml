@@ -23,6 +23,10 @@
         ovirt_host_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
+          nested_attributes:
+                - events
+                - cpu
+                - hardware_information
         register: hosts_info
     
       - name: Get number of storage domains
@@ -73,6 +77,11 @@
       - name: Debug host.cpu
         debug:
           msg: "{{ hosts_info }}"
+
+      - name: Debug host.events
+        debug:
+          msg: "{{ host.events }}"
+        loop: "{{ hosts_info.ovirt_hosts }}"
     
       - name: Generate HTML report
         template:
