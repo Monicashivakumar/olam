@@ -78,10 +78,9 @@
         debug:
           msg: "{{ hosts_info }}"
 
-      - name: Debug host.events
+      - name: Debug hosts_info
         debug:
-          msg: "{{ hosts_info.events }}"
-        loop: "{{ hosts_info.ovirt_hosts }}"
+          msg: "{{ hosts_info.ovirt_hosts | map(attribute='name') | list }}"
     
       - name: Generate HTML report
         template:
