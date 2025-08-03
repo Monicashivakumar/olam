@@ -83,10 +83,11 @@
         debug:
           msg: "{{ hosts_info }}"
 
-      - name: Debug events_info
+      - name: Print latest 3 events with severity error
         debug:
-          msg: "{{ item }}"
-        loop: "{{ events_info.ovirt_events }}"
+          msg: "{{ item.description }} - {{ item.time }}"
+        loop: "{{ events_info.ovirt_events | selectattr('severity', 'equalto', 'error') | sort(attribute='time', reverse=True) | list | slice(0,3) }}"
+  
     
       - name: Generate HTML report
         template:
