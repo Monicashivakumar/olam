@@ -80,7 +80,7 @@
 
       - name: Debug host.events
         debug:
-          msg: "{{ host.events }}"
+          msg: "{{ hosts_info.events }}"
         loop: "{{ hosts_info.ovirt_hosts }}"
     
       - name: Generate HTML report
