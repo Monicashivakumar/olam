@@ -162,7 +162,6 @@
             {% endfor %}
             {% endif %}
             <h3>Critical Events</h3>
-            {% if events_info.ovirt_events is defined %}
             <table>
                 <tr>
                     <th>Host Name</th>
@@ -181,9 +180,6 @@
                 {% endif %}
                 {% endfor %}
             </table>
-            {% else %}
-            <p>No critical events found.</p>
-            {% endif %}
         </div>
     </div>
 
