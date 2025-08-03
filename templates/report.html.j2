@@ -129,7 +129,7 @@
                         <td>{{ host.name }}</td>
                         <td>{{ host.cpu.name }}</td>
                         <td>{{ host.cpu.type | default('N/A') }}</td>
-                        <td>{{ host.cpu.topology.sockets | default('N/A') }}</td>
+                        <td>{{ host.cpu.topology.cores| default('N/A') }}</td>
                         <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
