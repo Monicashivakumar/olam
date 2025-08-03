@@ -55,13 +55,65 @@
     <div class="section">
         <h3><a onclick="toggleSection('general-info')">General Information</a></h3>
         <div id="general-info" class="hidden">
-            <!-- ... -->
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                </tr>
+                <tr>
+                    <td>KVM Hosts</td>
+                    <td>{{ hosts_info.ovirt_hosts | length }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts in Maintenance</td>
+                    <td>{{ hosts_in_maintenance }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts Non Responsive</td>
+                    <td>{{ hosts_non_responsive }}</td>
+                </tr>
+                <tr>
+                    <td>Hosts Non Operational</td>
+                    <td>{{ hosts_non_operational }}</td>
+                </tr>
+                <tr>
+                    <td>Storage Domains</td>
+                    <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
+                </tr>
+                <tr>
+                    <td>Clusters</td>
+                    <td>{{ clusters_info.ovirt_clusters | length }}</td>
+                </tr>
+                <tr>
+                    <td>Templates</td>
+                    <td>{{ templates_info.ovirt_templates | length }}</td>
+                </tr>
+                <tr>
+                    <td>Virtual Machines</td>
+                    <td>{{ vms_info.ovirt_vms | length }}</td>
+                </tr>
+                <tr>
+                    <td>Active VMs</td>
+                    <td>{{ active_vms }}</td>
+                </tr>
+                <tr>
+                    <td>Inactive VMs</td>
+                    <td>{{ inactive_vms }}</td>
+                </tr>
+            </table>
         </div>
         <h3><a onclick="toggleSection('cluster-info')">Cluster Information</a></h3>
         <div id="cluster-info" class="hidden">
             <h3>Clusters with compatibility version 4.7</h3>
             <table>
-                <!-- ... -->
+                <tr>
+                    <th>Name</th>
+                </tr>
+                {% for cluster in clusters_47 %}
+                <tr>
+                    <td>{{ cluster.name }}</td>
+                </tr>
+                {% endfor %}
             </table>
         </div>
         <h3><a onclick="toggleSection('host-info')">Host Information</a></h3>
@@ -85,6 +137,30 @@
                 </tr>
                 {% endfor %}
             </table>
+            {% if hosts_info.ovirt_hosts | selectattr('events', 'defined') | list | length > 0 %}
+                <h3>Critical Host Events</h3>
+                {% for host in hosts_info.ovirt_hosts %}
+                    {% if host.events is defined %}
+                        <h4>{{ host.name }}</h4>
+                        <table>
+                            <tr>
+                                <th>Event Type</th>
+                                <th>Description</th>
+                                <th>Time</th>
+                            </tr>
+                            {% for event in host.events %}
+                                {% if event.severity == 'error' or event.severity == 'alert' %}
+                                <tr>
+                                    <td>{{ event.severity }}</td>
+                                    <td>{{ event.description }}</td>
+                                    <td>{{ event.time | default('N/A') }}</td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -93,11 +169,10 @@
             var section = document.getElementById(id);
             if (section.classList.contains('hidden')) {
                 section.classList.remove('hidden');
-    } else {
-        section.classList.add('hidden');
-    }
-}
-
-</script>
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
