@@ -23,6 +23,10 @@
           - events
           - cpu
           - hardware_information
+          - os
+          - kdump_status
+          - selinux
+          - version
       register: hosts_info
 
 
@@ -133,60 +137,23 @@
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
 
-    - name: Gather host system facts for uptime, kernel, SELinux, kdump
-      ansible.builtin.setup:
-        gather_subset:
-          - 'min'
-          - 'hardware'
-          - 'network'
-          - 'virtual'
-          - 'facter'
-          - 'ohai'
-          - '!all'
-          - '!any'
-          - 'uptime'
-          - 'kernel'
-          - 'selinux'
-      register: sysfacts
-      delegate_to: "{{ item.address }}"
-      loop: "{{ hosts_info.ovirt_hosts }}"
-      loop_control:
-        label: "{{ item.name }}"
-      ignore_errors: yes
-    
-    # Build a fact mapping host names to system facts
-    - name: Build host facts dictionary
-      set_fact:
-        hosts_sys_facts: >-
-          {{
-            dict(
-              sysfacts.results | map(attribute='ansible_facts') | 
-              zip(hosts_info.ovirt_hosts | map(attribute='name'))
-            )
-          }}
-    
-    # Gather kdump, SELinux, kernel, and uptime, build a per-host summary list
-    - name: Build host extended summary
+    - name: Build summary for all hosts from ovirt info
       set_fact:
         hosts_extended_summary: >-
-          {%- set extended = [] -%}
+          {%- set summary = [] -%}
           {%- for host in hosts_info.ovirt_hosts -%}
-            {%- set sys = hosts_sys_facts.get(host.name, {}) -%}
-            {%- set uptime = sys.get('ansible_uptime_seconds', 'N/A') -%}
-            {%- set selinux = sys.get('ansible_selinux', {}).get('status', 'N/A') -%}
-            {%- set kernel = sys.get('ansible_kernel', 'N/A') -%}
-            {%- set kdump = host.kdump_status | default('N/A') -%}
             {%- set entry = {
                   'name': host.name,
-                  'uptime_seconds': uptime,
-                  'uptime_human': (uptime | int // 86400) ~ ' days ' ~ ((uptime | int % 86400) // 3600) ~ ' hours' if uptime != 'N/A' else 'N/A',
-                  'selinux': selinux,
-                  'kernel_version': kernel,
-                  'kdump': kdump
+                  'status': host.status | default('N/A'),
+                  'selinux': host.se_linux.mode | default('N/A'),
+                  'kernel_cmdline': host.os.reported_kernel_cmdline | default('N/A'),  # Not exactly version, but command line
+                  'kdump': host.kdump_status | default('N/A'),
+                  'vdsm_version': host.version.full_version | default('N/A')
                 } -%}
-            {%- do extended.append(entry) -%}
+            {%- do summary.append(entry) -%}
           {%- endfor -%}
-          {{ extended }}
+          {{ summary }}
+
 
     - name: Generate HTML report
       template:
