@@ -153,6 +153,8 @@
         inactive_vms_list: "{{ inactive_vms_list }}"
         clusters_47: "{{ clusters_47 }}"
         vms_created_last_month: "{{ vms_created_last_month }}"
+        self_hosted_engine: "{{ self_hosted_engine }}"
+        olvm_version: "{{ olvm_version }}"
 
     - name: Logout from OLVM
       ovirt_auth:
