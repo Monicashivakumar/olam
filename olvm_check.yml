@@ -102,6 +102,10 @@
       set_fact:
         clusters_47: "{{ clusters_info.ovirt_clusters | selectattr('version.major', 'equalto', 4) | selectattr('version.minor', 'equalto', 7) | list }}"
 
+    - name: Detect if deployment is Self Hosted Engine
+      set_fact:
+        self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
+
     - name: Debug host.cpu
       debug:
         msg: "{{ hosts_info }}"
