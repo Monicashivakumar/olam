@@ -53,6 +53,33 @@
     </div>
     <div class="section">
         <h3><a onclick="toggleSection('general-info')">General Information</a></h3>
+              <div id="general-info" class="hidden">
+                <!-- ... your existing general info table ... -->
+                <table>
+                  <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                    <th>Names</th>
+                  </tr>
+                  <!-- Your existing rows here -->
+                </table>
+                <br>
+                <table>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Value</th>
+                  </tr>
+                  <tr>
+                    <td>Self Hosted Engine Deployment</td>
+                    <td>{{ 'YES' if self_hosted_engine else 'NO' }}</td>
+                  </tr>
+                  <tr>
+                    <td>OLVM Version</td>
+                    <td>{{ olvm_version }}</td>
+                  </tr>
+                </table>
+              </div>
+        <h3><a onclick="toggleSection('general-info')">Environment Details</a></h3>
         <div id="general-info" class="hidden">
             <table>
                 <tr>
