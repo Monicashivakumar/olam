@@ -146,7 +146,7 @@
                   'name': host.name,
                   'status': host.status | default('N/A'),
                   'selinux': host.se_linux.mode | default('N/A'),
-                  'kernel_cmdline': host.os.reported_kernel_cmdline | default('N/A'),  # Not exactly version, but command line
+                  'kernel_cmdline': host.os.reported_kernel_cmdline | default('N/A'),  
                   'kdump': host.kdump_status | default('N/A'),
                   'vdsm_version': host.version.full_version | default('N/A')
                 } -%}
