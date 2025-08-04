@@ -280,7 +280,6 @@
                 </tr>
                 {% endfor %}
             </table>
-            {% if hosts_info.ovirt_hosts | selectattr('events', 'defined') | list | length > 0 %}
             <h3>Host Information</h3>
             <table>
                 <tr>
@@ -289,7 +288,6 @@
                     <th>SELinux Mode</th>
                     <th>Kernel Cmdline</th>
                     <th>Kdump</th>
-                    <th>VDSM Version</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
@@ -301,51 +299,9 @@
                     <td>{{ host.version.full_version | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
-            </table>
 
             </table>
-            <h3>Critical Host Events</h3>
-            {% for host in hosts_info.ovirt_hosts %}
-            {% if host.events is defined %}
-            <h4>{{ host.name }}</h4>
-            <table>
-                <tr>
-                    <th>Event Type</th>
-                    <th>Description</th>
-                    <th>Time</th>
-                </tr>
-                {% for event in host.events %}
-                {% if event.severity == 'error' or event.severity == 'alert' %}
-                <tr>
-                    <td>{{ event.severity }}</td>
-                    <td>{{ event.description }}</td>
-                    <td>{{ event.time | default('N/A') }}</td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </table>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            <h3>Critical Events</h3>
-            <table>
-                <tr>
-                    <th>Host Name</th>
-                    <th>Description</th>
-                    <th>Time</th>
-                </tr>
-                {% for host in hosts_info.ovirt_hosts %}
-                {% if host.events is defined %}
-                {% for event in (host.events | selectattr('severity', 'equalto', 'error') | sort(attribute='time', reverse=True))[:1] %}
-                <tr>
-                    <td>{{ host.name }}</td>
-                    <td>{{ event.description }}</td>
-                    <td>{{ event.time }}</td>
-                </tr>
-                {% endfor %}
-                {% endif %}
-                {% endfor %}
-            </table>
+           
         </div>
     </div>
     <script>
