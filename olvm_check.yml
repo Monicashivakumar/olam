@@ -83,7 +83,9 @@
         debug:
           msg: "{{ hosts_info }}"
 
-  
+      - name: Debug storage_domains_info
+        debug:
+          msg: "{{ storage_domains_info }}"
     
       - name: Generate HTML report
         template:
