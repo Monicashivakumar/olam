@@ -116,8 +116,8 @@
       debug:
         var: dnf_engine_info.stdout_lines
 
-     - name: Set OLVM version fact from dnf
-       set_fact:
+    - name: Set OLVM version fact from dnf
+      set_fact:
           olvm_version: >-
             {%- set vline = (dnf_engine_info.stdout_lines | select('search', '^Version\\s*:') | list | first | default('')) -%}
             {%- set rline = (dnf_engine_info.stdout_lines | select('search', '^Release\\s*:') | list | first | default('')) -%}
