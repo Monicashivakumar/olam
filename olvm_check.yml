@@ -93,9 +93,9 @@
         set_fact:
           current_epoch: "{{ lookup('pipe', 'date +%s') | int }}"
     
-      - name: Get number of VMs created in the last month
+      - name: Get number of VMs created in the last 30 days
         set_fact:
-          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (current_epoch - 2592000 | int | to_datetime)) | list | length }}"
+          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
     
       - name: Generate HTML report
         template:
