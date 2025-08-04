@@ -112,8 +112,8 @@
       changed_when: false
       become: yes
 
-   - name: Debug dnf info output
-     debug:
+    - name: Debug dnf info output
+      debug:
         var: dnf_engine_info.stdout_lines
   
       
