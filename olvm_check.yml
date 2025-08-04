@@ -1,4 +1,4 @@
-- hosts: 10.0.0.242
+- hosts: all
   become: yes
   become_method: sudo
   gather_facts: no
