@@ -106,22 +106,11 @@
       set_fact:
         self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
         
-    - name: Get OLVM Engine version with dnf
-      command: "dnf info ovirt-engine"
-      register: dnf_engine_info
+    - name: Get OLVM Engine version with rpm
+      command: "rpm -q --qf '%{VERSION}-%{RELEASE}\\n' ovirt-engine"
+      register: olvm_raw_version
       changed_when: false
       become: yes
-
-    - name: Debug dnf info output
-      debug:
-        var: dnf_engine_info.stdout_lines
-
-    - name: Set OLVM version fact from dnf
-      set_fact:
-          olvm_version: >-
-            {%- set vline = (dnf_engine_info.stdout_lines | select('search', '^Version\\s*:') | list | first | default('')) -%}
-            {%- set rline = (dnf_engine_info.stdout_lines | select('search', '^Release\\s*:') | list | first | default('')) -%}
-            {{ (vline.split(':', 1)[1].strip() if ':' in vline else 'N/A') ~ '-' ~ (rline.split(':', 1)[1].strip() if ':' in rline else 'N/A') }}
   
     
     - name: Set OLVM version fact
@@ -143,6 +132,61 @@
     - name: Get number of VMs created in the last 30 days
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
+
+    - name: Gather host system facts for uptime, kernel, SELinux, kdump
+      ansible.builtin.setup:
+        gather_subset:
+          - 'min'
+          - 'hardware'
+          - 'network'
+          - 'virtual'
+          - 'facter'
+          - 'ohai'
+          - '!all'
+          - '!any'
+          - 'uptime'
+          - 'kernel'
+          - 'selinux'
+      register: sysfacts
+      delegate_to: "{{ item.address }}"
+      loop: "{{ hosts_info.ovirt_hosts }}"
+      loop_control:
+        label: "{{ item.name }}"
+      ignore_errors: yes
+    
+    # Build a fact mapping host names to system facts
+    - name: Build host facts dictionary
+      set_fact:
+        hosts_sys_facts: >-
+          {{
+            dict(
+              sysfacts.results | map(attribute='ansible_facts') | 
+              zip(hosts_info.ovirt_hosts | map(attribute='name'))
+            )
+          }}
+    
+    # Gather kdump, SELinux, kernel, and uptime, build a per-host summary list
+    - name: Build host extended summary
+      set_fact:
+        hosts_extended_summary: >-
+          {%- set extended = [] -%}
+          {%- for host in hosts_info.ovirt_hosts -%}
+            {%- set sys = hosts_sys_facts.get(host.name, {}) -%}
+            {%- set uptime = sys.get('ansible_uptime_seconds', 'N/A') -%}
+            {%- set selinux = sys.get('ansible_selinux', {}).get('status', 'N/A') -%}
+            {%- set kernel = sys.get('ansible_kernel', 'N/A') -%}
+            {%- set kdump = host.kdump_status | default('N/A') -%}
+            {%- set entry = {
+                  'name': host.name,
+                  'uptime_seconds': uptime,
+                  'uptime_human': (uptime | int // 86400) ~ ' days ' ~ ((uptime | int % 86400) // 3600) ~ ' hours' if uptime != 'N/A' else 'N/A',
+                  'selinux': selinux,
+                  'kernel_version': kernel,
+                  'kdump': kdump
+                } -%}
+            {%- do extended.append(entry) -%}
+          {%- endfor -%}
+          {{ extended }}
 
     - name: Generate HTML report
       template:
@@ -173,6 +217,7 @@
         vms_created_last_month: "{{ vms_created_last_month }}"
         self_hosted_engine: "{{ self_hosted_engine }}"
         olvm_version: "{{ olvm_version }}"
+        hosts_extended_summary: "{{ hosts_extended_summary }}"
 
     - name: Logout from OLVM
       ovirt_auth:
