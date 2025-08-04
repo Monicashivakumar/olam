@@ -88,6 +88,14 @@
       - name: Debug storage_domains_info
         debug:
           msg: "{{ storage_domains_info }}"
+
+      - name: Get current epoch time
+        set_fact:
+          current_epoch: "{{ lookup('pipe', 'date +%s') | int }}"
+      
+      - name: Get number of VMs created in the last month
+        set_fact:
+          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (current_epoch - 2592000) | to_datetime) | list | length }}"
     
       - name: Generate HTML report
         template:
@@ -106,6 +114,7 @@
           clusters_47: "{{ clusters_47 }}"
           active_vms: "{{ active_vms }}"
           inactive_vms: "{{ inactive_vms }}"
+          vms_created_last_month: "{{ vms_created_last_month }}"
 
     
       - name: Logout from OLVM
