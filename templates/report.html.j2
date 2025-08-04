@@ -51,7 +51,6 @@
     <div class="logo">
         <img src="fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
     </div>
-
     <div class="section">
         <h3><a onclick="toggleSection('general-info')">General Information</a></h3>
         <div id="general-info" class="hidden">
@@ -59,46 +58,117 @@
                 <tr>
                     <th>Category</th>
                     <th>Count</th>
+                    <th>Names</th>
                 </tr>
                 <tr>
                     <td>KVM Hosts</td>
                     <td>{{ hosts_info.ovirt_hosts | length }}</td>
+                    <td>
+                        {% if hosts_info.ovirt_hosts %}
+                            {{ hosts_info.ovirt_hosts | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Hosts in Maintenance</td>
                     <td>{{ hosts_in_maintenance }}</td>
+                    <td>
+                        {% if hosts_maintenance_list %}
+                            {{ hosts_maintenance_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Hosts Non Responsive</td>
                     <td>{{ hosts_non_responsive }}</td>
+                    <td>
+                        {% if hosts_non_responsive_list %}
+                            {{ hosts_non_responsive_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Hosts Non Operational</td>
                     <td>{{ hosts_non_operational }}</td>
+                    <td>
+                        {% if hosts_non_operational_list %}
+                            {{ hosts_non_operational_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Storage Domains</td>
                     <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
+                    <td>
+                        {% if storage_domains_info.ovirt_storage_domains %}
+                            {{ storage_domains_info.ovirt_storage_domains | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Clusters</td>
                     <td>{{ clusters_info.ovirt_clusters | length }}</td>
+                    <td>
+                        {% if clusters_info.ovirt_clusters %}
+                            {{ clusters_info.ovirt_clusters | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Templates</td>
                     <td>{{ templates_info.ovirt_templates | length }}</td>
+                    <td>
+                        {% if templates_info.ovirt_templates %}
+                            {{ templates_info.ovirt_templates | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Virtual Machines</td>
                     <td>{{ vms_info.ovirt_vms | length }}</td>
+                    <td>
+                        {% if vms_info.ovirt_vms %}
+                            {{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Active VMs</td>
                     <td>{{ active_vms }}</td>
+                    <td>
+                        {% if active_vms_list %}
+                            {{ active_vms_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>Inactive VMs</td>
                     <td>{{ inactive_vms }}</td>
+                    <td>
+                        {% if inactive_vms_list %}
+                            {{ inactive_vms_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
             </table>
         </div>
@@ -234,7 +304,6 @@
             </table>
         </div>
     </div>
-
     <script>
         function toggleSection(id) {
             var section = document.getElementById(id);
