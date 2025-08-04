@@ -281,24 +281,28 @@
                 {% endfor %}
             </table>
             {% if hosts_info.ovirt_hosts | selectattr('events', 'defined') | list | length > 0 %}
-            <h3>Detailed Host State and Configuration</h3>
+            <h3>Host Information</h3>
             <table>
                 <tr>
                     <th>Host</th>
-                    <th>Uptime</th>
-                    <th>SELinux Status</th>
-                    <th>Kernel Version</th>
+                    <th>Status</th>
+                    <th>SELinux Mode</th>
+                    <th>Kernel Cmdline</th>
                     <th>Kdump</th>
+                    <th>VDSM Version</th>
                 </tr>
-                {% for host in hosts_extended_summary %}
+                {% for host in hosts_info.ovirt_hosts %}
                 <tr>
                     <td>{{ host.name }}</td>
-                    <td>{{ host.uptime_human }}</td>
-                    <td>{{ host.selinux }}</td>
-                    <td>{{ host.kernel_version }}</td>
-                    <td>{{ host.kdump }}</td>
+                    <td>{{ host.status | default('N/A') }}</td>
+                    <td>{{ host.se_linux.mode | default('N/A') }}</td>
+                    <td>{{ host.os.reported_kernel_cmdline | default('N/A') }}</td>
+                    <td>{{ host.kdump_status | default('N/A') }}</td>
+                    <td>{{ host.version.full_version | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
+            </table>
+
             </table>
             <h3>Critical Host Events</h3>
             {% for host in hosts_info.ovirt_hosts %}
