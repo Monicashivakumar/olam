@@ -137,23 +137,6 @@
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
 
-    - name: Build summary for all hosts from ovirt info
-      set_fact:
-        hosts_extended_summary: >-
-          {%- set summary = [] -%}
-          {%- for host in hosts_info.ovirt_hosts -%}
-            {%- set entry = {
-                  'name': host.name,
-                  'status': host.status | default('N/A'),
-                  'selinux': host.se_linux.mode | default('N/A'),
-                  'kernel_cmdline': host.os.reported_kernel_cmdline | default('N/A'),  
-                  'kdump': host.kdump_status | default('N/A'),
-                  'vdsm_version': host.version.full_version | default('N/A')
-                } -%}
-            {%- do summary.append(entry) -%}
-          {%- endfor -%}
-          {{ summary }}
-
 
     - name: Generate HTML report
       template:
@@ -184,7 +167,6 @@
         vms_created_last_month: "{{ vms_created_last_month }}"
         self_hosted_engine: "{{ self_hosted_engine }}"
         olvm_version: "{{ olvm_version }}"
-        hosts_extended_summary: "{{ hosts_extended_summary }}"
 
     - name: Logout from OLVM
       ovirt_auth:
