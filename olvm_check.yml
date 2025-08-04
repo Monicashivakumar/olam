@@ -115,15 +115,7 @@
    - name: Debug dnf info output
      debug:
         var: dnf_engine_info.stdout_lines
-    
-    - name: Set OLVM version fact from dnf
-      set_fact:
-        olvm_version: >-
-          {{
-            (dnf_engine_info.stdout_lines | select('search', '^Version\\s*:') | list | first | regex_replace('^Version\\s*:\\s*', ''))
-            ~ '-'
-            ~ (dnf_engine_info.stdout_lines | select('search', '^Release\\s*:') | list | first | regex_replace('^Release\\s*:\\s*', ''))
-          }}
+  
       
     - name: Set OLVM version fact
       set_fact:
