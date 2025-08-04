@@ -106,12 +106,22 @@
       set_fact:
         self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
         
-    - name: Get OLVM version via RPM (if running playbook on manager itself)
-      command: "rpm -q --qf '%{VERSION}-%{RELEASE}\\n' ovirt-engine"
-      register: olvm_version
+    - name: Get OLVM Engine version with dnf
+      command: "dnf info ovirt-engine"
+      register: dnf_engine_info
       changed_when: false
+      become: yes
       delegate_to: localhost
     
+    - name: Set OLVM version fact from dnf
+      set_fact:
+        olvm_version: >-
+          {{
+            (dnf_engine_info.stdout_lines | select('search', '^Version\\s*:') | list | first | regex_replace('^Version\\s*:\\s*', ''))
+            ~ '-'
+            ~ (dnf_engine_info.stdout_lines | select('search', '^Release\\s*:') | list | first | regex_replace('^Release\\s*:\\s*', ''))
+          }}
+      
     - name: Set OLVM version fact
       set_fact:
         olvm_version: "{{ olvm_version.stdout }}"
