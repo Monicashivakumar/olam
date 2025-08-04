@@ -108,7 +108,7 @@
         
     - name: Get OLVM Engine version with rpm
       command: "rpm -q --qf '%{VERSION}-%{RELEASE}\\n' ovirt-engine"
-      register: olvm_raw_version
+      register: olvm_version
       changed_when: false
       become: yes
   
