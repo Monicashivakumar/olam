@@ -111,7 +111,6 @@
       register: dnf_engine_info
       changed_when: false
       become: yes
-      delegate_to: localhost
     
     - name: Set OLVM version fact from dnf
       set_fact:
