@@ -38,6 +38,8 @@
         ovirt_storage_domain_info:
           auth: "{{ ovirt_auth }}"
           fetch_nested: true
+          nested_attributes:
+            - data_center
         register: storage_domains_info
     
       - name: Get number of VMs
