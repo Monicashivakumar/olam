@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Healthcheck Report</title>
+    <style>
+        html {font-family: 'Verdana', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;}
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #eee; }
+        td {text-align: center;}
+    </style>
+</head>
+<body>
+    <h1>Healthcheck Report</h1>
+    <p>Report snapshot generated on: {{ ansible_date_time.date }} at {{ ansible_date_time.time }}</p>
+    <p>Servers checked: {{ groups['all'] | length }}</p> 
+       
+    <table>
+        <tr>
+            <th>Host</th>
+            <th>Uptime</th>
+            <th>RPM Updates Available</th>
+            <th>CPU Usage </th>
+            <th>Average Load</th>
+            <th>Used Nocache Memory</th>
+            <th>Free Nocache Memory</th>
+            <th>Used Real Memory Used</th>
+            <th>Free Real Memory</th>
+            <th>Total Available Memory</th>
+            <th># Flagged Storage Devices</th>
+            <th>Host Details</th>
+        </tr>
+        {% for host in groups['all']  %}
+            {% set uptime = hostvars[host]['data_pack']['uptime'] | default('N/A') %}  
+            {% set num_rpm_updates = hostvars[host]['data_pack']['num_rpm_updates'] | default(-1) %}   
+            {% set cpu_percent_usage = hostvars[host]['data_pack']['cpu_percent_usage']| default(-1) %} 
+            
+            {% set load_avg1 = hostvars[host]['ansible_facts']["loadavg"]['1m'] | default(-1) %}
+            {% set load_avg5 = hostvars[host]['ansible_facts']["loadavg"]['5m']  | default(-1) %}                    
+            {% set load_avg15 = hostvars[host]['ansible_facts']["loadavg"]['15m'] | default(-1) %}      
+            {% set nocache_used = hostvars[host]['ansible_facts']["memory_mb"]["nocache"]["used"] | default(-1) %}  
+            {% set nocache_free = hostvars[host]['ansible_facts']["memory_mb"]["nocache"]["free"] | default(-1) %}
+                
+            {% set real_used = hostvars[host]['ansible_facts']["memory_mb"]["real"]["used"] | default(-1) %}
+            {% set real_free = hostvars[host]['ansible_facts']["memory_mb"]["real"]["free"] | default(-1) %}        
+            {% set total_mem = hostvars[host]['ansible_facts']["memtotal_mb"] | default(-1) %}
+            {% set num_flagged_disks = hostvars[host]['data_pack']["num_flagged_disks"] | default(-1) %}                 
+        <tr>
+            <td>{{ host }}</td>
+            <td>{{ uptime | default('N/A') }}</td>
+            <td>{{ num_rpm_updates | default('# N/A') }} RPMs</td>
+            <td>{{ cpu_percent_usage | default('N/A')}}% </td>
+            <td>
+            {{ load_avg1 | default('N/A') }} (1 min) | 
+            {{ load_avg5 | default('N/A') }} (5 min) |
+            {{ load_avg15 | default('N/A') }} (15 min)
+            </td>
+            <td>{{ nocache_used }} MB ( {{ (( (nocache_used / total_mem) ) *100) | round (2) }}% )</td>
+            <td>{{ nocache_free }} MB ( {{ (( (nocache_free / total_mem) ) *100) | round (2) }}% )</td>
+            
+            <td>{{ real_used }} MB ( {{ (( (real_used / total_mem) ) *100) | round (2) }}% )</td>
+            <td>{{ real_free }} MB ( {{ (( (real_free / total_mem) ) *100) | round (2) }}% )</td>
+            
+            <td>{{ total_mem | default('N/A') }} MB</td>
+            
+            <td>{{ num_flagged_disks | default('N/A') }}</td>
+            <td><a href="{{ host }}_detailed_report.html" target="_blank">[View Details]</a></td>   
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
