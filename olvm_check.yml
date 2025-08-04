@@ -106,9 +106,15 @@
       set_fact:
         self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
         
-    - name: Set OLVM version (example extraction from hosts_info)
+    - name: Get OLVM version via RPM (if running playbook on manager itself)
+      command: "rpm -q --qf '%{VERSION}-%{RELEASE}\\n' ovirt-engine"
+      register: olvm_version
+      changed_when: false
+      delegate_to: localhost
+    
+    - name: Set OLVM version fact
       set_fact:
-        olvm_version: "{{ hosts_info.ovirt_hosts[0].version.full_version if hosts_info.ovirt_hosts|length > 0 else 'N/A' }}"
+        olvm_version: "{{ olvm_version.stdout }}"
 
     - name: Debug host.cpu
       debug:
