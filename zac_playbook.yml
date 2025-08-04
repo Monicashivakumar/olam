@@ -116,7 +116,7 @@
   tasks:
     - name: Generate main report based on inventory size
       template:
-        src: 'templates/report.html.j2'
+        src: 'templates/zac_report.html.j2'
         dest: "{{ playbook_dir }}/reports/multihost_healthcheck_report.html"
       vars:
         all_hosts: "{{ ansible_play_hosts_all }}"
