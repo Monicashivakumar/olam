@@ -121,11 +121,19 @@
             <table>
                 <tr>
                     <th>Storage Domain Name</th>
+                    <th>Storage Domain Type</th>
+                    <th>Number of Disks</th>
                     <th>% Used</th>
                 </tr>
                 {% for sd in storage_domains_info.ovirt_storage_domains %}
                 <tr>
                     <td>{{ sd.name }}</td>
+                    <td>{{ sd.type }}</td>
+                    {% if sd.disks is defined %}
+                    <td>{{ sd.disks | length }}</td>
+                    {% else %}
+                    <td>N/A</td>
+                    {% endif %}
                     {% if sd.used is defined and sd.available is defined %}
                     <td>{{ ((sd.used / (sd.used + sd.available)) * 100) | round(2) }}%</td>
                     {% else %}
