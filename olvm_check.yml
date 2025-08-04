@@ -2,122 +2,150 @@
   become: yes
   become_method: sudo
   gather_facts: no
-
   vars_files:
     - default_vars.yml
-
   tasks:
+    - name: Login to OLVM manager
+      ovirt_auth:
+        url: "{{ lookup('env', 'OVIRT_URL') }}"
+        username: "{{ lookup('env', 'OVIRT_USERNAME') }}"
+        password: "{{ lookup('env', 'OVIRT_PASSWORD') }}"
+        ca_file: "{{ olvm_cafile | default('/etc/pki/ovirt-engine/ca.pem') }}"
+        insecure: "{{ olvm_insecure | default(true) }}"
+      tags:
+        - always
 
-      - name: Login to OLVM manager
-        ovirt_auth:
-          url: "{{ lookup('env', 'OVIRT_URL') }}"
-          username: "{{ lookup('env', 'OVIRT_USERNAME') }}"
-          password: "{{ lookup('env', 'OVIRT_PASSWORD') }}"
-          ca_file: "{{ olvm_cafile | default('/etc/pki/ovirt-engine/ca.pem') }}"
-          insecure: "{{ olvm_insecure | default(true) }}"
-        tags:
-          - always
-          
+    - name: Get number of KVM hosts
+      ovirt_host_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+        nested_attributes:
+          - events
+          - cpu
+          - hardware_information
+      register: hosts_info
 
-      - name: Get number of KVM hosts
-        ovirt_host_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-          nested_attributes:
-                - events
-                - cpu
-                - hardware_information
-        register: hosts_info
+    - name: Get events
+      ovirt_event_info:
+        auth: "{{ ovirt_auth }}"
+      register: events_info
 
-      - name: Get events
-        ovirt_event_info:
-          auth: "{{ ovirt_auth }}"
-        register: events_info
-    
-      - name: Get number of storage domains
-        ovirt_storage_domain_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-          nested_attributes:
-            - data_center
-        register: storage_domains_info
-    
-      - name: Get number of VMs
-        ovirt_vm_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-        register: vms_info
-    
-      - name: Get number of clusters
-        ovirt_cluster_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-        register: clusters_info
-    
-      - name: Get number of templates
-        ovirt_template_info:
-          auth: "{{ ovirt_auth }}"
-          fetch_nested: true
-        register: templates_info
-    
-      - name: Get number of hosts in maintenance state
-        set_fact:
-          hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
-    
-      - name: Get number of hosts in non responsive state
-        set_fact:
-          hosts_non_responsive: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | list | length }}"
-    
-      - name: Get number of hosts in non operational state
-        set_fact:
-          hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
+    - name: Get number of storage domains
+      ovirt_storage_domain_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+        nested_attributes:
+          - data_center
+      register: storage_domains_info
 
-      - name: Count active and inactive VMs
-        set_fact:
-          active_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'up') | list | length }}"
-          inactive_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'down') | list | length }}"
-    
-      - name: Get clusters with compatibility version 4.7
-        set_fact:
-          clusters_47: "{{ clusters_info.ovirt_clusters | selectattr('version.major', 'equalto', 4) | selectattr('version.minor', 'equalto', 7) | list }}"
+    - name: Get number of VMs
+      ovirt_vm_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+      register: vms_info
 
-      - name: Debug host.cpu
-        debug:
-          msg: "{{ hosts_info }}"
+    - name: Get number of clusters
+      ovirt_cluster_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+      register: clusters_info
 
-      - name: Debug storage_domains_info
-        debug:
-          msg: "{{ storage_domains_info }}"
+    - name: Get number of templates
+      ovirt_template_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+      register: templates_info
 
-      - name: Get current epoch time
-        set_fact:
-          current_epoch: "{{ lookup('pipe', 'date +%s') | int }}"
-    
-      - name: Get number of VMs created in the last 30 days
-        set_fact:
-          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
-    
-      - name: Generate HTML report
-        template:
-          src: templates/report.html.j2
-          dest: /etc/pki/ca-trust/report.html
-          mode: '0644'
-        vars:
-          hosts_info: "{{ hosts_info }}"
-          storage_domains_info: "{{ storage_domains_info }}"
-          vms_info: "{{ vms_info }}"
-          clusters_info: "{{ clusters_info }}"
-          templates_info: "{{ templates_info }}"
-          hosts_in_maintenance: "{{ hosts_in_maintenance }}"
-          hosts_non_responsive: "{{ hosts_non_responsive }}"
-          hosts_non_operational: "{{ hosts_non_operational }}"
-          clusters_47: "{{ clusters_47 }}"
-          active_vms: "{{ active_vms }}"
-          inactive_vms: "{{ inactive_vms }}"
-          vms_created_last_month: "{{ vms_created_last_month }}"
+    # Generate lists and counts for hosts states
+    - name: Get number and names of hosts in maintenance state
+      set_fact:
+        hosts_in_maintenance: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | list | length }}"
+        hosts_maintenance_list: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'maintenance') | map(attribute='name') | list }}"
 
-    
-      - name: Logout from OLVM
-        ovirt_auth:
-          state: absent
-          ovirt_auth: "{{ ovirt_auth }}"
+    - name: Get number and names of hosts in non responsive state
+      set_fact:
+        hosts_non_responsive: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | list | length }}"
+        hosts_non_responsive_list: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_responsive') | map(attribute='name') | list }}"
+
+    - name: Get number and names of hosts in non operational state
+      set_fact:
+        hosts_non_operational: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | list | length }}"
+        hosts_non_operational_list: "{{ hosts_info.ovirt_hosts | selectattr('status', 'equalto', 'non_operational') | map(attribute='name') | list }}"
+
+    # Storage domains names
+    - name: List names of storage domains
+      set_fact:
+        storage_domains_list: "{{ storage_domains_info.ovirt_storage_domains | map(attribute='name') | list }}"
+
+    # Clusters names
+    - name: List names of clusters
+      set_fact:
+        clusters_list: "{{ clusters_info.ovirt_clusters | map(attribute='name') | list }}"
+
+    # Templates names
+    - name: List names of templates
+      set_fact:
+        templates_list: "{{ templates_info.ovirt_templates | map(attribute='name') | list }}"
+
+    # VM counts and name lists
+    - name: Count active and inactive VMs and list their names
+      set_fact:
+        active_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'up') | list | length }}"
+        inactive_vms: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'down') | list | length }}"
+        active_vms_list: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'up') | map(attribute='name') | list }}"
+        inactive_vms_list: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'down') | map(attribute='name') | list }}"
+        vms_list: "{{ vms_info.ovirt_vms | map(attribute='name') | list }}"
+
+    # Clusters 4.7 compatibility
+    - name: Get clusters with compatibility version 4.7
+      set_fact:
+        clusters_47: "{{ clusters_info.ovirt_clusters | selectattr('version.major', 'equalto', 4) | selectattr('version.minor', 'equalto', 7) | list }}"
+
+    - name: Debug host.cpu
+      debug:
+        msg: "{{ hosts_info }}"
+
+    - name: Debug storage_domains_info
+      debug:
+        msg: "{{ storage_domains_info }}"
+
+    - name: Get current epoch time
+      set_fact:
+        current_epoch: "{{ lookup('pipe', 'date +%s') | int }}"
+
+    - name: Get number of VMs created in the last 30 days
+      set_fact:
+        vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
+
+    - name: Generate HTML report
+      template:
+        src: templates/report.html.j2
+        dest: /etc/pki/ca-trust/report.html
+        mode: '0644'
+      vars:
+        hosts_info: "{{ hosts_info }}"
+        storage_domains_info: "{{ storage_domains_info }}"
+        vms_info: "{{ vms_info }}"
+        clusters_info: "{{ clusters_info }}"
+        templates_info: "{{ templates_info }}"
+        hosts_in_maintenance: "{{ hosts_in_maintenance }}"
+        hosts_maintenance_list: "{{ hosts_maintenance_list }}"
+        hosts_non_responsive: "{{ hosts_non_responsive }}"
+        hosts_non_responsive_list: "{{ hosts_non_responsive_list }}"
+        hosts_non_operational: "{{ hosts_non_operational }}"
+        hosts_non_operational_list: "{{ hosts_non_operational_list }}"
+        storage_domains_list: "{{ storage_domains_list }}"
+        clusters_list: "{{ clusters_list }}"
+        templates_list: "{{ templates_list }}"
+        vms_list: "{{ vms_list }}"
+        active_vms: "{{ active_vms }}"
+        inactive_vms: "{{ inactive_vms }}"
+        active_vms_list: "{{ active_vms_list }}"
+        inactive_vms_list: "{{ inactive_vms_list }}"
+        clusters_47: "{{ clusters_47 }}"
+        vms_created_last_month: "{{ vms_created_last_month }}"
+
+    - name: Logout from OLVM
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
