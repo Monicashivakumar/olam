@@ -143,6 +143,31 @@
                 {% endfor %}
             </table>
         </div>
+        <h3><a onclick="toggleSection('vm-info')">Virtual Machines</a></h3>
+        <div id="vm-info" class="hidden">
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Count</th>
+                </tr>
+                <tr>
+                    <td>Total Virtual Machines</td>
+                    <td>{{ vms_info.ovirt_vms | length }}</td>
+                </tr>
+                <tr>
+                    <td>VMs Up</td>
+                    <td>{{ active_vms }}</td>
+                </tr>
+                <tr>
+                    <td>VMs Created Last Month</td>
+                    <td>{{ vms_created_last_month }}</td>
+                </tr>
+                <tr>
+                    <td>VMs in Shutdown State</td>
+                    <td>{{ inactive_vms }}</td>
+                </tr>
+            </table>
+        </div>
         <h3><a onclick="toggleSection('host-info')">Host Information</a></h3>
         <div id="host-info" class="hidden">
             <h3>Hosts and their CPU Models</h3>
