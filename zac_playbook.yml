@@ -1,0 +1,123 @@
+---
+- name: Healthcheck
+  hosts: all
+  gather_facts: true 
+  
+  vars:
+    # change the below value for desired threshold level
+    disk_usage_threshold_percent: 80
+
+  tasks:
+    - name: Create reports directory
+      file:
+        path: "{{ playbook_dir }}/reports"
+        state: directory
+      delegate_to: localhost
+      run_once: true  
+
+    - name: Extract/parse uptime string
+      set_fact:
+          uptime_string: "{{ now().replace(microsecond=0) - now().fromtimestamp(now(fmt='%s') | int - ansible_uptime_seconds) }}"
+
+    - name: Check for packages requiring update
+      ansible.builtin.shell: dnf check-update | awk 'p;/^$/{p=1}' | grep -c "^[a-zA-Z0-9._+-]"
+      register: dnf_check_output
+      changed_when: false
+      failed_when: false
+
+    - name: Set fact for dnf check-update result 
+      set_fact:
+        dnf_check_result: "{{ dnf_check_output.stdout }}"
+
+
+    - name: Get CPU idle percentage using top
+      shell: top -b -n1 | grep -i "Cpu(s)" | awk '{print int($8)}'
+      register: cpu_idle
+
+    - name: Calculate and set CPU utilization percent
+      set_fact:
+        cpu_util_pcnt: "{{ (100 - (cpu_idle.stdout | float)) | round(0, 'common') | int }}"
+
+
+    - name: Get top 10 CPU-consuming processes with sorted JSON output
+      shell: |
+        top -b -n1 -w 200 | 
+        awk 'NR>7 {printf "%s|%s|%.1f|%.1f|%s\n", $1, $2, $9, $10, $12}' | 
+        sort -t'|' -k3,3nr | 
+        head -n 10 | 
+        awk -F'|' '
+          BEGIN {print "["}
+          {
+            printf "{\"pid\":\"%s\",\"user\":\"%s\",\"cpu\":\"%s\",\"mem\":\"%s\",\"command\":\"%s\"}%s\n",
+                  $1, $2, $3, $4, $5, (NR==10 ? "" : ",")
+          }
+          END {print "]"}
+        '
+      register: top_processes_json
+
+    - name: Parse JSON process data for template
+      set_fact:
+        top_process_list: "{{ top_processes_json.stdout | from_json }}"
+
+
+    - name: Flag disks over threshold
+      set_fact:
+        flagged_disks: >-
+          [{% for m in ansible_mounts
+                if (m.device is match('^/dev/.*|^C:'))
+                and (m.size_total > 0)
+                and (((m.size_total - m.size_available) / m.size_total * 100) | round(1) >= disk_usage_threshold_percent) %}
+            {
+              "mount": "{{ m.mount }}",
+              "device": "{{ m.device }}",
+               "used_percent": {{ ((m.size_total - m.size_available) / m.size_total * 100) | round(1) }}
+            }
+          {%- if not loop.last %},{% endif %}
+          {%- endfor %}]
+          
+    - name: Count flagged disks
+      set_fact:
+        temp_num_flagged_disks: "{{ flagged_disks | length }}"
+
+
+    - name: Package variables into data structure for control node
+      set_fact:
+        data_pack:
+          # hostname: "{{ inventory_hostname }}"
+          # date: "{{ ansible_date_time.date }}"
+          # time: "{{ ansible_date_time.time }}"          
+          uptime: "{{ uptime_string }}"
+          num_rpm_updates: "{{ dnf_check_result }}"
+          cpu_percent_usage: "{{ cpu_util_pcnt }}"
+          # load_averages : "{{ ansible_loadavg  }}"
+          # nocache_free: "{{ ansible_memory_mb.nocache.free }}"
+          # nocache_used: "{{ ansible_memory_mb.nocache.used }}"
+          # real_free: "{{ ansible_memory_mb.real.free }}"
+          # real_used: "{{ ansible_memory_mb.real.used }}"
+          # total_mem: "{{ ansible_memtotal_mb }}"
+          num_flagged_disks: "{{ temp_num_flagged_disks }}"
+          process_list: "{{ top_process_list }}"
+          # num_checked: "{{ groups['all'] | length }}"
+          # ansible_mounts: "{{ ansible_mounts }}"
+
+    - name: Generate detailed report for each host
+      template:
+        src: 'templates/singlereport.html.j2'
+        dest: "{{ playbook_dir }}/reports/{{ inventory_hostname }}_detailed_report.html"
+      vars:
+        target_host: "{{ inventory_hostname }}"
+        host_data: "{{ ansible_facts }}"
+        custom_data: "{{ data_pack }}"
+      delegate_to: localhost
+
+- name: Generate summary view report for all hosts
+  hosts: localhost
+  run_once: true
+  tasks:
+    - name: Generate main report based on inventory size
+      template:
+        src: 'templates/report.html.j2'
+        dest: "{{ playbook_dir }}/reports/multihost_healthcheck_report.html"
+      vars:
+        all_hosts: "{{ ansible_play_hosts_all }}"
+      when: groups['all']|length > 1
