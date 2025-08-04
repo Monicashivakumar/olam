@@ -53,33 +53,6 @@
     </div>
     <div class="section">
         <h3><a onclick="toggleSection('general-info')">General Information</a></h3>
-              <div id="general-info" class="hidden">
-                <!-- ... your existing general info table ... -->
-                <table>
-                  <tr>
-                    <th>Category</th>
-                    <th>Count</th>
-                    <th>Names</th>
-                  </tr>
-                  <!-- Your existing rows here -->
-                </table>
-                <br>
-                <table>
-                  <tr>
-                    <th>Attribute</th>
-                    <th>Value</th>
-                  </tr>
-                  <tr>
-                    <td>Self Hosted Engine Deployment</td>
-                    <td>{{ 'YES' if self_hosted_engine else 'NO' }}</td>
-                  </tr>
-                  <tr>
-                    <td>OLVM Version</td>
-                    <td>{{ olvm_version }}</td>
-                  </tr>
-                </table>
-              </div>
-        <h3><a onclick="toggleSection('evnironment-info')">Environment Details</a></h3>
         <div id="general-info" class="hidden">
             <table>
                 <tr>
@@ -198,7 +171,23 @@
                     </td>
                 </tr>
             </table>
+            <br>
+            <table>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Self Hosted Engine Deployment</td>
+                    <td>{{ 'YES' if self_hosted_engine else 'NO' }}</td>
+                </tr>
+                <tr>
+                    <td>OLVM Version</td>
+                    <td>{{ olvm_version }}</td>
+                </tr>
+            </table>
         </div>
+
         <h3><a onclick="toggleSection('cluster-info')">Cluster Information</a></h3>
         <div id="cluster-info" class="hidden">
             <h3>Clusters with compatibility version 4.7</h3>
@@ -213,6 +202,7 @@
                 {% endfor %}
             </table>
         </div>
+
         <h3><a onclick="toggleSection('storage-info')">Storage</a></h3>
         <div id="storage-info" class="hidden">
             <table>
@@ -240,6 +230,7 @@
                 {% endfor %}
             </table>
         </div>
+
         <h3><a onclick="toggleSection('vm-info')">Virtual Machines</a></h3>
         <div id="vm-info" class="hidden">
             <table>
@@ -265,6 +256,7 @@
                 </tr>
             </table>
         </div>
+
         <h3><a onclick="toggleSection('host-info')">Host Information</a></h3>
         <div id="host-info" class="hidden">
             <h3>Hosts and their CPU Models</h3>
@@ -272,16 +264,16 @@
                 <tr>
                     <th>Name</th>
                     <th>CPU Model</th>
-                    <th>CPU Type </th>
-                    <th>Number of CPUs </th>
-                    <th>Manufacturer </th>
+                    <th>CPU Type</th>
+                    <th>Number of CPUs</th>
+                    <th>Manufacturer</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
                     <td>{{ host.name }}</td>
                     <td>{{ host.cpu.name }}</td>
                     <td>{{ host.cpu.type | default('N/A') }}</td>
-                    <td>{{ host.cpu.topology.cores| default('N/A') }}</td>
+                    <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
                     <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
