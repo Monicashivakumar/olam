@@ -105,6 +105,10 @@
     - name: Detect if deployment is Self Hosted Engine
       set_fact:
         self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
+        
+    - name: Set OLVM version (example extraction from hosts_info)
+      set_fact:
+        olvm_version: "{{ hosts_info.ovirt_hosts[0].version.full_version if hosts_info.ovirt_hosts|length > 0 else 'N/A' }}"
 
     - name: Debug host.cpu
       debug:
