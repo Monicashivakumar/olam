@@ -95,7 +95,7 @@
     
       - name: Get number of VMs created in the last month
         set_fact:
-          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (current_epoch - 2592000) | to_datetime) | list | length }}"
+          vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', ((current_epoch | int) - 2592000) | to_datetime) | list | length }}"
     
       - name: Generate HTML report
         template:
