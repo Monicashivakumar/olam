@@ -25,23 +25,6 @@
           - hardware_information
       register: hosts_info
 
-    - name: Get system permissions (to find admin users)
-      ovirt_permission_info:
-        auth: "{{ ovirt_auth }}"
-        fetch_nested: true
-        nested_attributes:
-          - role
-          - user
-      register: permission_info
-
-    - name: Get admin users with SuperUser role at system level
-      set_fact:
-        admin_users_list: >-
-          {{ permission_info.ovirt_permissions
-             | selectattr('role.name', 'equalto', 'SuperUser')
-             | selectattr('object_id', 'equalto', '00000000-0000-0000-0000-000000000000')
-             | map(attribute='user.name') | list }}
-        admin_users_count: "{{ admin_users_list | length }}"
 
     - name: Get events
       ovirt_event_info:
