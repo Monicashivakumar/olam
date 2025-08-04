@@ -267,6 +267,7 @@
                     <th>CPU Type</th>
                     <th>Number of CPUs</th>
                     <th>Manufacturer</th>
+                    <th>VDSM Version</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
@@ -275,6 +276,7 @@
                     <td>{{ host.cpu.type | default('N/A') }}</td>
                     <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
                     <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
+                    <td>{{ host.version.full_version | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
             </table>
