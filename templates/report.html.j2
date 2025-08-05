@@ -181,10 +181,19 @@
             </table>
         </div>
         <div id="cluster-info" class="section-content">
+            <h3>Clusters with compatibility version 4.7</h3>
+            <table>
+                <tr><th>Name</th></tr>
+                {% for cluster in clusters_47 %}
+                <tr><td>{{ cluster.name }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
           <h3> Cluster Information </h3>
           <table>
           <tr>
             <th>Name</th>
+            <th>Data Center</th>
             <th>CPU Type</th>
             <th>Compat Ver</th>
             <th>Hosts</th>
@@ -197,58 +206,34 @@
             <th>Mgmt Network</th>
             <th>Policy</th>
           </tr>
-          {% if clusters_info.ovirt_clusters is defined and clusters_info.ovirt_clusters | length > 0 %}
           {% for cluster in clusters_info.ovirt_clusters %}
-            <tr>
-              <td>{{ cluster.name | default('N/A') }}</td>
-        
-              <td>
-                {% if cluster.cpu is defined and cluster.cpu.type is defined %}
-                  {{ cluster.cpu.type }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-        
-              <td>
-                {% if cluster.version is defined %}
-                  {{ cluster.version.major | default('') }}.{{ cluster.version.minor | default('') }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-        
-              <td>
-                {% if cluster.data_center is mapping and cluster.data_center.name is defined %}
-                  {{ cluster.data_center.name }}
-                {% else %}
-                  {{ cluster.data_center | default('N/A') }}
-                {% endif %}
-              </td>
-        
-              <td>
-                {% if cluster.scheduling_policy is mapping and cluster.scheduling_policy.name is defined %}
-                  {{ cluster.scheduling_policy.name }}
-                {% else %}
-                  {{ cluster.scheduling_policy | default('N/A') }}
-                {% endif %}
-              </td>
-        
-              <td>
-                {% if cluster.management_network is mapping and cluster.management_network.name is defined %}
-                  {{ cluster.management_network.name }}
-                {% else %}
-                  {{ cluster.management_network | default('N/A') }}
-                {% endif %}
-              </td>
-            </tr>
+          <tr>
+            <td>{{ cluster.name }}</td>
+            <td>
+              {% if cluster.data_center and cluster.data_center.name is defined %}
+                {{ cluster.data_center.name }}
+              {% else %}N/A{% endif %}
+            </td>
+            <td>
+              {% if cluster.cpu is defined and cluster.cpu.type is defined %}
+                {{ cluster.cpu.type }}
+              {% else %}N/A{% endif %}
+            </td>
+            <td>{{ cluster.version.major }}.{{ cluster.version.minor }}</td>
+            <td><!-- Count hosts with host.cluster.id == cluster.id --></td>
+            <td><!-- Count VMs with vm.cluster.id == cluster.id --></td>
+            <td>{% if cluster.networks is defined %}{{ cluster.networks | length }}{% else %}N/A{% endif %}</td>
+            <td>{{ cluster.status | default('N/A') }}</td>
+            <td>{{ cluster.virt_service | default('N/A') }}</td>
+            <td>{{ cluster.gluster_service | default('N/A') }}</td>
+            <td>
+              {% if cluster.ha_reservation is defined %}{{ 'Yes' if cluster.ha_reservation else 'No' }}{% else %}N/A{% endif %}
+            </td>
+            <td><!-- Management network name if present --></td>
+            <td>{{ cluster.scheduling_policy | default('Default') }}</td>
+          </tr>
           {% endfor %}
-        {% else %}
-          <tr><td colspan="6">No clusters found</td></tr>
-        {% endif %}
-
         </table>
-        </div>
         <div id="storage-info" class="section-content">
             <h3>Storage Domains</h3>
             <table>
