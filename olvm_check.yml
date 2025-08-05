@@ -149,6 +149,17 @@
         inactive_vms_list: "{{ vms_info.ovirt_vms | selectattr('status', 'equalto', 'down') | map(attribute='name') | list }}"
         vms_list: "{{ vms_info.ovirt_vms | map(attribute='name') | list }}"
 
+    - name: List VMs with HA enabled
+      set_fact:
+        ha_enabled_vms_list: >-
+          {{
+            vms_info.ovirt_vms
+            | selectattr('high_availability.enabled', 'defined')
+            | selectattr('high_availability.enabled', 'equalto', true)
+            | map(attribute='name')
+            | list
+          }}
+
     # Clusters 4.7 compatibility
     - name: Get clusters with compatibility version 4.7
       set_fact:
@@ -182,27 +193,7 @@
                 )
              )
           }}
-    - name: Build network name to VM name mapping
-      set_fact:
-        net_to_vms: >-
-          {{
-            dict(
-              networks_info.ovirt_networks | map(attribute='name') | zip(
-                networks_info.ovirt_networks | map('extract', vms_info.ovirt_vms | map('list', attribute='nics') | sum(start=[])) | map('selectattr', 'network.name', 'equalto', item) | map('map', attribute='name') | map('list') | list
-              )
-            )
-          }}
-    
-    - name: Build network name to Host name mapping
-      set_fact:
-        net_to_hosts: >-
-          {{
-            dict(
-              networks_info.ovirt_networks | map(attribute='name') | zip(
-                networks_info.ovirt_networks | map('extract', hosts_info.ovirt_hosts | map('list', attribute='nics') | sum(start=[])) | map('selectattr', 'network.name', 'equalto', item) | map('map', attribute='name') | map('list') | list
-              )
-            )
-          }}
+
  
     - name: Generate HTML report
       template:
@@ -237,8 +228,7 @@
         self_hosted_engine: "{{ self_hosted_engine }}"
         olvm_version: "{{ olvm_version }}"
         datacenter_id_to_name: "{{ datacenter_id_to_name }}"
-        net_to_vms: "{{ net_to_vms }}"
-        net_to_hosts: "{{ net_to_hosts }}"
+  
         
 
     - name: Logout from OLVM
