@@ -31,6 +31,7 @@
           - nics
           - bonds
           - network_attachments
+          - statistics
       register: hosts_info
 
     - name: Get events
