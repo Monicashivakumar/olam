@@ -197,36 +197,56 @@
             <th>Mgmt Network</th>
             <th>Policy</th>
           </tr>
+          {% if clusters_info.ovirt_clusters is defined and clusters_info.ovirt_clusters | length > 0 %}
           {% for cluster in clusters_info.ovirt_clusters %}
-          <tr>
-            <td>{{ cluster.name if cluster.name is defined else 'N/A' }}</td>
-            <td>
-              {% if cluster.cpu is defined and cluster.cpu.type is defined %}
-                {{ cluster.cpu.type }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <td>
-              {% if cluster.version is defined %}
-                {{ cluster.version.major }}.{{ cluster.version.minor }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <td>
-              {{ cluster.data_center.name if cluster.data_center is defined and cluster.data_center.name is defined else 'N/A' }}
-            </td>
-            <td>
-              {{ cluster.scheduling_policy.name if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined else 'N/A' }}
-            </td>
-            <td>
-              {{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}
-            </td>
-            <td>{{ cluster_id_to_host_count[cluster.id] | default(0) }}</td>
-            <td>{{ cluster_id_to_vm_count[cluster.id] | default(0) }}</td>
-          </tr>
-        {% endfor %}
+            <tr>
+              <td>{{ cluster.name | default('N/A') }}</td>
+        
+              <td>
+                {% if cluster.cpu is defined and cluster.cpu.type is defined %}
+                  {{ cluster.cpu.type }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+        
+              <td>
+                {% if cluster.version is defined %}
+                  {{ cluster.version.major | default('') }}.{{ cluster.version.minor | default('') }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+        
+              <td>
+                {% if cluster.data_center is mapping and cluster.data_center.name is defined %}
+                  {{ cluster.data_center.name }}
+                {% else %}
+                  {{ cluster.data_center | default('N/A') }}
+                {% endif %}
+              </td>
+        
+              <td>
+                {% if cluster.scheduling_policy is mapping and cluster.scheduling_policy.name is defined %}
+                  {{ cluster.scheduling_policy.name }}
+                {% else %}
+                  {{ cluster.scheduling_policy | default('N/A') }}
+                {% endif %}
+              </td>
+        
+              <td>
+                {% if cluster.management_network is mapping and cluster.management_network.name is defined %}
+                  {{ cluster.management_network.name }}
+                {% else %}
+                  {{ cluster.management_network | default('N/A') }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="6">No clusters found</td></tr>
+        {% endif %}
+
         </table>
         </div>
         <div id="storage-info" class="section-content">
