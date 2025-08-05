@@ -185,7 +185,6 @@
           <table>
           <tr>
             <th>Name</th>
-            <th>Data Center</th>
             <th>CPU Type</th>
             <th>Compat Ver</th>
             <th>Hosts</th>
@@ -201,11 +200,6 @@
           {% for cluster in clusters_info.ovirt_clusters %}
           <tr>
             <td>{{ cluster.name }}</td>
-            <td>
-              {% if cluster.data_center and cluster.data_center.name is defined %}
-                {{ cluster.data_center.name }}
-              {% else %}N/A{% endif %}
-            </td>
             <td>
               {% if cluster.cpu is defined and cluster.cpu.type is defined %}
                 {{ cluster.cpu.type }}
