@@ -183,6 +183,16 @@
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
 
+    - name: Get list of VMs created in the last 30 days
+      set_fact:
+        vms_created_last_month_list: >-
+          {{
+            vms_info.ovirt_vms
+            | selectattr('creation_time', '>=', (lookup('pipe', 'date -d "30 days ago" +%Y-%m-%d')))
+            | map(attribute='name')
+            | list
+          }}
+
     - name: Build datacenter_id_to_name mapping
       set_fact:
         datacenter_id_to_name: >-
@@ -229,6 +239,7 @@
         olvm_version: "{{ olvm_version }}"
         datacenter_id_to_name: "{{ datacenter_id_to_name }}"
         ha_enabled_vms_list: "{{ ha_enabled_vms_list }}"
+        vms_created_last_month_list: "{{ vms_created_last_month_list }}"
   
         
 
