@@ -160,6 +160,15 @@
             | list
           }}
 
+    - name: Get VMs with OS "Oracle Linux 8.x"
+      set_fact:
+        oracle_linux_8_vms_list: >-
+          {{ vms_info.ovirt_vms
+             | selectattr('os.type', 'defined')
+             | selectattr('os.type', 'search', '^oraclelinux8')
+             | map(attribute='name')
+             | list }}
+
     # Clusters 4.7 compatibility
     - name: Get clusters with compatibility version 4.7
       set_fact:
@@ -240,6 +249,7 @@
         datacenter_id_to_name: "{{ datacenter_id_to_name }}"
         ha_enabled_vms_list: "{{ ha_enabled_vms_list }}"
         vms_created_last_month_list: "{{ vms_created_last_month_list }}"
+        oracle_linux_8_vms_list: "{{ oracle_linux_8_vms_list }}"
   
         
 
