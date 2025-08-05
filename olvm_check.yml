@@ -217,25 +217,24 @@
       set_fact:
         cluster_id_to_host_count: >-
           {{
-            hosts_info.ovirt_hosts
-            | selectattr('cluster', 'defined')
-            | selectattr('cluster.id', 'defined')
-            | groupby('cluster.id')
-            | map('first')  
-            | zip(
-                hosts_info.ovirt_hosts
-                | selectattr('cluster', 'defined')
-                | selectattr('cluster.id', 'defined')
-                | groupby('cluster.id')
-                | map('last') 
-                | map('length')
+            dict(
+              hosts_info.ovirt_hosts
+              | selectattr('cluster', 'defined')
+              | selectattr('cluster.id', 'defined')
+              | groupby('cluster.id')
+              | map('extract', [0, 'id'])  # extract cluster.id
+              | zip(
+                  hosts_info.ovirt_hosts
+                  | selectattr('cluster', 'defined')
+                  | selectattr('cluster.id', 'defined')
+                  | groupby('cluster.id')
+                  | map('last')
+                  | map('length')
+              )
             )
-            | map('zip', ['key', 'value'])
-            | map('community.general.dict_kv')
-            | list
-            | items2dict
           }}
-    
+
+
     - name: Map cluster ID to VM count
       set_fact:
         cluster_id_to_vm_count: >-
