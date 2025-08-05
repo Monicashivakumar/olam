@@ -213,34 +213,16 @@
              )
           }}
 
-    - name: Map cluster ID to host count (fixed and robust)
+    - name: Build cluster_id_to_name mapping
       set_fact:
-        cluster_id_to_host_count: >-
+        cluster_id_to_name: >-
           {{
             dict(
-              (
-                hosts_info.ovirt_hosts
-                | selectattr('cluster', 'defined')
-                | selectattr('cluster.id', 'defined')
-                | groupby('cluster.id')
-                | list  
-              )
-              | map('extract', 0)  
+              clusters_info.ovirt_clusters
+              | selectattr('id', 'defined') | map(attribute='id')
               | zip(
-                  (
-                    hosts_info.ovirt_hosts
-                    | selectattr('cluster', 'defined')
-                    | selectattr('cluster.id', 'defined')
-                    | groupby('cluster.id')
-                    | list 
-                  )
-                  | map('extract', 1)  
-                  | map('length')    
-              )
-            )
-          }}
-
-
+                  clusters_info.ovirt_clusters
+                  | selectattr('name', 'defined') | map(attribute='name')
 
 
     - name: Map cluster ID to VM count
