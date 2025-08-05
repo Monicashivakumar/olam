@@ -336,6 +336,7 @@
                     </tr>
                     {% endfor %}
                 </table>
+        
 
                 <h3>Host OS &amp; Security Configuration</h3>
                 <table>
@@ -353,6 +354,22 @@
                         <td>{{ host.se_linux.mode | default('N/A') }}</td>
                         <td>{{ host.os.reported_kernel_cmdline | default('N/A') }}</td>
                         <td>{{ host.kdump_status | default('N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <h3>Networks</h3>
+                <table>
+                    <tr>
+                        <th>Name</th><th>Data Center</th><th>VLAN ID</th><th>Usage</th>
+                    </tr>
+                    {% for net in networks_info.ovirt_networks %}
+                    <tr>
+                        <td>{{ net.name }}</td>
+                        <td>{{ net.data_center.name | default('N/A') }}</td>
+                        <td>{{ net.vlan.id | default('None') }}</td>
+                        <td>
+                            {% if net.usages %}{{ net.usages | join(', ') }}{% else %}N/A{% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
