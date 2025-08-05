@@ -213,20 +213,27 @@
              )
           }}
 
-    - name: Build cluster_id_to_name mapping
+    - name: Map cluster ID to VM count
       set_fact:
-        cluster_id_to_name: >-
+        cluster_id_to_vm_count: >-
           {{
             dict(
-              clusters_info.ovirt_clusters
-              | selectattr('id', 'defined') | map(attribute='id')
+              vms_info.ovirt_vms
+              | selectattr('cluster', 'defined')
+              | selectattr('cluster.id', 'defined')
+              | map(attribute='cluster.id')
+              | list
+              | unique
               | zip(
-                  clusters_info.ovirt_clusters
-                  | selectattr('name', 'defined') | map(attribute='name')
-                )
+                  vms_info.ovirt_vms
+                  | selectattr('cluster', 'defined')
+                  | selectattr('cluster.id', 'defined')
+                  | groupby('cluster.id')
+                  | map('last')
+                  | map('length')
+              )
             )
           }}
-
 
     - name: Map cluster ID to VM count
       set_fact:
