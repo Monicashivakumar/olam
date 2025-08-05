@@ -223,6 +223,9 @@
               | zip(
                   clusters_info.ovirt_clusters
                   | selectattr('name', 'defined') | map(attribute='name')
+                )
+            )
+          }}
 
 
     - name: Map cluster ID to VM count
