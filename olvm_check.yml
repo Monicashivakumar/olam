@@ -166,7 +166,6 @@
           {{ vms_info.ovirt_vms
              | selectattr('os.type', 'defined')
              | selectattr('os.type', 'search', '^Oracle Linux 8.x')
-             | selectattr('os.type', 'match', '(?i)oracle linux 8\\.x')
              | map(attribute='name')
              | list }}
 
@@ -251,10 +250,11 @@
         ha_enabled_vms_list: "{{ ha_enabled_vms_list }}"
         vms_created_last_month_list: "{{ vms_created_last_month_list }}"
         oracle_linux_8_vms_list: "{{ oracle_linux_8_vms_list }}"
-
-
+  
+        
 
     - name: Logout from OLVM
       ovirt_auth:
         state: absent
+        ovirt_auth: "{{ ovirt_auth }}"
         ovirt_auth: "{{ ovirt_auth }}"
