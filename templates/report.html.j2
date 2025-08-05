@@ -351,6 +351,7 @@
                 <th>Manufacturer</th>
                 <th>VDSM Version</th>
                 <th>Power Mgmt Enabled</th>
+                <th>Free RAM (GB)</th>
             </tr>
             {% for host in hosts_info.ovirt_hosts %}
             <tr>
@@ -363,6 +364,14 @@
                 <td>
                     {% if host.power_management is defined and host.power_management.enabled is defined %}
                         {{ 'Yes' if host.power_management.enabled else 'No' }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% set free_mem_stat = (host.statistics | selectattr('name', 'equalto', 'memory.free') | first) if host.statistics is defined else None %}
+                    {% if free_mem_stat and free_mem_stat.values and free_mem_stat.values[0].datum is defined %}
+                        {{ (free_mem_stat.values[0].datum / 1073741824) | round(2) }}
                     {% else %}
                         N/A
                     {% endif %}
