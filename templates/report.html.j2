@@ -287,8 +287,6 @@
                 <th>Data Center</th>
                 <th>VLAN ID</th>
                 <th>Usage</th>
-                <th>Used by VM</th>
-                <th> used by host </th>
             </tr>
             {% if networks_info.ovirt_networks is defined and networks_info.ovirt_networks|length > 0 %}
                 {% for net in networks_info.ovirt_networks %}
@@ -321,20 +319,6 @@
                             N/A
                         {% endif %}
                     </td>
-                         <td>
-                          {% if net_to_vms is defined and net.name in net_to_vms and net_to_vms[net.name]|length > 0 %}
-                            {{ net_to_vms[net.name] | join(', ') }}
-                          {% else %}
-                            N/A
-                          {% endif %}
-                        </td>
-                        <td>
-                          {% if net_to_hosts is defined and net.name in net_to_hosts and net_to_hosts[net.name]|length > 0 %}
-                            {{ net_to_hosts[net.name] | join(', ') }}
-                          {% else %}
-                            N/A
-                          {% endif %}
-                        </td>
                 </tr>
                 {% endfor %}
             {% else %}
