@@ -280,6 +280,7 @@
         ha_enabled_vms_list: "{{ ha_enabled_vms_list }}"
         vms_created_last_month_list: "{{ vms_created_last_month_list }}"
         oracle_linux_8_vms_list: "{{ oracle_linux_8_vms_list }}"
+        vms_with_snapshots: "{{ vms_with_snapshots }}"
 
 
 
