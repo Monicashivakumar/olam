@@ -279,7 +279,6 @@
             </table>
         </div>
         <div id="network-info" class="section-content">
-            <div id="network-info" class="section-content">
             <h3>Network Information</h3>
             <table>
                 <tr>
@@ -290,52 +289,57 @@
                     <th>MTU</th>
                     <th>Number of VNICs</th>
                 </tr>
-                {% for net in networks_info.ovirt_networks %}
-                <tr>
-                    <td>
-                        {% if net is defined and net.name is defined %}
-                            {{ net.name }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if net.data_center is defined and net.data_center.name is defined %}
-                            {{ net.data_center.name }}
-                        {% elif net.data_center is string %}
-                            {{ net.data_center }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if net.vlan is defined and net.vlan.id is defined %}
-                            {{ net.vlan.id }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if net.usages is defined %}
-                            {{ net.usages | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ net.mtu | default('Default') }}
-                    </td>
-                    <td>
-                        {% if net.vnics is defined %}
-                            {{ net.vnics | length }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
+                {% if networks_info.ovirt_networks is defined and networks_info.ovirt_networks|length > 0 %}
+                    {% for net in networks_info.ovirt_networks %}
+                    <tr>
+                        <td>
+                            {% if net is defined and net.name is defined %}
+                                {{ net.name }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if net.data_center is defined and net.data_center.name is defined %}
+                                {{ net.data_center.name }}
+                            {% elif net.data_center is string %}
+                                {{ net.data_center }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if net.vlan is defined and net.vlan.id is defined %}
+                                {{ net.vlan.id }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if net.usages is defined %}
+                                {{ net.usages | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ net.mtu | default('Default') }}
+                        </td>
+                        <td>
+                            {% if net.vnics is defined %}
+                                {{ net.vnics | length }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="6" style="text-align:center;color:#a6a6a6;font-style:italic;">No network data available</td></tr>
+                {% endif %}
             </table>
-            </div>
+        </div>
+    </div>
 </div>
 <script>
     function showSection(sectionId) {
