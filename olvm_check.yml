@@ -165,7 +165,7 @@
         oracle_linux_8_vms_list: >-
           {{ vms_info.ovirt_vms
              | selectattr('os.type', 'defined')
-             | selectattr('os.type', 'search', '^oraclelinux8')
+             | selectattr('os.type', 'search', '^Oracle Linux 8.x')
              | map(attribute='name')
              | list }}
 
