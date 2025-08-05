@@ -273,6 +273,58 @@
                     <td>{% if  oracle_linux_8_vms_list %}{{  oracle_linux_8_vms_list | join(', ') }}{% else %}None{% endif %}</td>
                 </tr>
             </table>
+            <table>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Cluster</th>
+                <th>Template</th>
+                <th>Creation Time</th>
+                <th>High Availability</th>
+                <th>Has Snapshots</th>
+            </tr>
+            {% for vm in vms_info.ovirt_vms %}
+            <tr>
+                <td>{{ vm.name | default('N/A') }}</td>
+                <td>{{ vm.status | default('N/A') }}</td>
+                <td>
+                    {% if vm.cluster is defined and vm.cluster.name is defined %}
+                        {{ vm.cluster.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if vm.template is defined and vm.template.name is defined %}
+                        {{ vm.template.name }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if vm.creation_time is defined %}
+                        {{ vm.creation_time }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if vm.high_availability is defined and vm.high_availability.enabled is defined %}
+                        {{ 'Yes' if vm.high_availability.enabled else 'No' }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if vm.snapshots is defined and vm.snapshots | length > 0 %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
         </div>
         <div id="host-info" class="section-content"> 
             <h3>Hosts and their CPU Models</h3>
