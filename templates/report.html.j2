@@ -191,9 +191,7 @@
             <th>Status</th>
             <th>Virt Service</th>
             <th>Gluster Service</th>
-            <th>Ha Reservation</th>
-            <th>Mgmt Network</th>
-            <th>Policy</th>
+            
           </tr>
           {% for cluster in clusters_info.ovirt_clusters %}
           <tr>
@@ -204,9 +202,7 @@
             <td>{{ cluster.status | default('N/A') }}</td>
             <td>{{ cluster.virt_service | default('N/A') }}</td>
             <td>{{ cluster.gluster_service | default('N/A') }}</td>
-            <td>{{ cluster.ha_reservation | default('N/A') }}</td>
-            <td>{{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}</td>
-            <td>{{ cluster.scheduling_policy.name if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined else 'N/A' }}</td>
+            
           </tr>
           {% endfor %}
         </table>
