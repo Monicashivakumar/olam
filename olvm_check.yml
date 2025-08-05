@@ -215,6 +215,17 @@
             | list
           }}
 
+    - name: List VMs with snapshots
+      set_fact:
+        vms_with_snapshots: >-
+          {{
+            vms_info.ovirt_vms
+            | selectattr('snapshots', 'defined')
+            | selectattr('snapshots', '!=', [])
+            | map(attribute='name')
+            | list
+          }}
+
     - name: Build datacenter_id_to_name mapping
       set_fact:
         datacenter_id_to_name: >-
