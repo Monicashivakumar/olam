@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -199,38 +198,15 @@
           {% for cluster in clusters_info.ovirt_clusters %}
           <tr>
             <td>{{ cluster.name if cluster is defined and cluster.name is defined else 'N/A' }}</td>
-            <td>
-              {% if cluster.cpu is defined and cluster.cpu.type is defined %}
-                {{ cluster.cpu.type }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <td>
-              {% if cluster.version is defined and cluster.version.major is defined and cluster.version.minor is defined %}
-                {{ cluster.version.major }}.{{ cluster.version.minor }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            <td>
-              {% if cluster.networks is defined and cluster.networks|length > 0 %}
-                {{ cluster.networks | selectattr('name', 'defined') | map(attribute='name') | join(', ') }}
-              {% else %}
-                N/A
-              {% endif %}
-            </td>
-            </td>
+            <td>{% if cluster.cpu is defined and cluster.cpu.type is defined %}{{ cluster.cpu.type }}{% else %}N/A{% endif %}</td>
+            <td>{% if cluster.version is defined and cluster.version.major is defined and cluster.version.minor is defined %}{{ cluster.version.major }}.{{ cluster.version.minor }}{% else %}N/A{% endif %}</td>
+            <td>{% if cluster.networks is defined and cluster.networks|length > 0 %}{{ cluster.networks | selectattr('name', 'defined') | map(attribute='name') | join(', ') }}{% else %}N/A{% endif %}</td>
             <td>{{ cluster.status | default('N/A') }}</td>
             <td>{{ cluster.virt_service | default('N/A') }}</td>
             <td>{{ cluster.gluster_service | default('N/A') }}</td>
             <td>{{ cluster.ha_reservation | default('N/A') }}</td>
-            <td>
-              {{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}
-            </td>
-            <td>
-              {{ cluster.scheduling_policy.name if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined else 'N/A' }}
-            </td>
+            <td>{{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}</td>
+            <td>{{ cluster.scheduling_policy.name if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined else 'N/A' }}</td>
           </tr>
           {% endfor %}
         </table>
@@ -269,118 +245,73 @@
                 <tr>
                     <td>Total Virtual Machines</td>
                     <td>{{ vms_info.ovirt_vms | length }}</td>
-                    <td>
-                        {% if vms_info.ovirt_vms %}
-                            {{ vms_info.ovirt_vms | map(attribute='name', default='N/A') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                    <td>{% if vms_info.ovirt_vms %}{{ vms_info.ovirt_vms | map(attribute='name', default='N/A') | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>VMs Up</td>
                     <td>{{ active_vms }}</td>
-                    <td>
-                        {% if active_vms_list %}
-                            {{ active_vms_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                    <td>{% if active_vms_list %}{{ active_vms_list | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>VMs Created Last Month</td>
                     <td>{{ vms_created_last_month }}</td>
-                    <td>
-                        {% if vms_created_last_month_list %}
-                            {{ vms_created_last_month_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                    <td>{% if vms_created_last_month_list %}{{ vms_created_last_month_list | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>VMs in Shutdown State</td>
                     <td>{{ inactive_vms }}</td>
-                    <td>
-                        {% if inactive_vms_list %}
-                            {{ inactive_vms_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
+                    <td>{% if inactive_vms_list %}{{ inactive_vms_list | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>VMs with HA Enabled</td>
-                    <td>
-                        {% if ha_enabled_vms_list %}
-                            {{ ha_enabled_vms_list | length }}
-                        {% else %}
-                            0
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if ha_enabled_vms_list %}
-                            {{ ha_enabled_vms_list | join(', ') }}
-                        {% else %}
-                            None
-                        {% endif %}
-                    </td>
+                    <td>{% if ha_enabled_vms_list %}{{ ha_enabled_vms_list | length }}{% else %}0{% endif %}</td>
+                    <td>{% if ha_enabled_vms_list %}{{ ha_enabled_vms_list | join(', ') }}{% else %}None{% endif %}</td>
                 </tr>
                 <tr>
                     <td>VMs with OS Oracle Linux 8.x</td>
                     <td>{{  oracle_linux_8_vms_list | length }}</td>
-                    <td>
-                        {% if  oracle_linux_8_vms_list %}
-                            {{  oracle_linux_8_vms_list | join(', ') }}
-                        {% else %}
-                            None
-                        {% endif %}
-                    </td>
+                    <td>{% if  oracle_linux_8_vms_list %}{{  oracle_linux_8_vms_list | join(', ') }}{% else %}None{% endif %}</td>
                 </tr>
             </table>
         </div>
-        <div id="host-info" class="section-content">  
-        <h3>Hosts and their CPU Models</h3>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>CPU Model</th>
-                <th>CPU Type</th>
-                <th>Number of CPUs</th>
-                <th>Manufacturer</th>
-                <th>VDSM Version</th>
-                <th>Power Mgmt Enabled</th>
-                <th>Libvirt Version</th>
-                <th>KVM Version</th>
-            </tr>
-            {% for host in hosts_info.ovirt_hosts %}
-            <tr>
-                <td>{{ host.name | default('N/A') }}</td>
-                <td>{{ host.cpu.name if host.cpu is defined and host.cpu.name is defined else 'N/A' }}</td>
-                <td>{{ host.cpu.type if host.cpu is defined and host.cpu.type is defined else 'N/A' }}</td>
-                <td>{{ host.cpu.topology.cores if host.cpu is defined and host.cpu.topology is defined and host.cpu.topology.cores is defined else 'N/A' }}</td>
-                <td>{{ host.hardware_information.manufacturer if host.hardware_information is defined and host.hardware_information.manufacturer is defined else 'N/A' }}</td>
-                <td>{{ host.version.full_version if host.version is defined and host.version.full_version is defined else 'N/A' }}</td>
-                <td>
-                    {% if host.power_management is defined and host.power_management.enabled is defined %}
-                        {{ 'Yes' if host.power_management.enabled else 'No' }}
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-                <td>
-                    {{ host.libvirt_version.full_version if host.libvirt_version is defined and host.libvirt_version.full_version is defined else 'N/A' }}
-                </td>
-                <td>
-                    {{ host.kvm_version.full_version if host.kvm_version is defined and host.kvm_version.full_version is defined else 'N/A' }}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        
-            {% endfor %}
-        </table>
+        <div id="host-info" class="section-content"> 
+            <h3>Hosts and their CPU Models</h3>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>CPU Model</th>
+                    <th>CPU Type</th>
+                    <th>Number of CPUs</th>
+                    <th>Manufacturer</th>
+                    <th>VDSM Version</th>
+                    <th>Power Mgmt Enabled</th>
+                    <th>Libvirt Version</th>
+                    <th>KVM Version</th>
+                </tr>
+                {% for host in hosts_info.ovirt_hosts %}
+                <tr>
+                    <td>{{ host.name | default('N/A') }}</td>
+                    <td>{{ host.cpu.name if host.cpu is defined and host.cpu.name is defined else 'N/A' }}</td>
+                    <td>{{ host.cpu.type if host.cpu is defined and host.cpu.type is defined else 'N/A' }}</td>
+                    <td>{{ host.cpu.topology.cores if host.cpu is defined and host.cpu.topology is defined and host.cpu.topology.cores is defined else 'N/A' }}</td>
+                    <td>{{ host.hardware_information.manufacturer if host.hardware_information is defined and host.hardware_information.manufacturer is defined else 'N/A' }}</td>
+                    <td>{{ host.version.full_version if host.version is defined and host.version.full_version is defined else 'N/A' }}</td>
+                    <td>
+                        {% if host.power_management is defined and host.power_management.enabled is defined %}
+                            {{ 'Yes' if host.power_management.enabled else 'No' }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ host.libvirt_version.full_version if host.libvirt_version is defined and host.libvirt_version.full_version is defined else 'N/A' }}
+                    </td>
+                    <td>
+                        {{ host.kvm_version.full_version if host.kvm_version is defined and host.kvm_version.full_version is defined else 'N/A' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
             <h3>Host OS &amp; Security Configuration</h3>
             <table>
                 <tr>
