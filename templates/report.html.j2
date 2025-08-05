@@ -281,6 +281,16 @@
                             None
                         {% endif %}
                     </td>
+                    <td>VMs with OS Oracle Linux 8.x</td>
+                    <td>{{  oracle_linux_8_vms_list | length }}</td>
+                    <td>
+                        {% if  oracle_linux_8_vms_list %}
+                            {{  oracle_linux_8_vms_list | join(', ') }}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </td>
+                </tr>
                 </tr>
             </table>
         </div>
