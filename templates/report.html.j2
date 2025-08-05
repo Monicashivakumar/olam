@@ -1,50 +1,106 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html>
 <head>
     <title>Oracle Linux Virtualization Manager Report</title>
     <style>
         body {
-            font-family: 'Verdana', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;}
-            background-color: #f2f2f2;
+            font-family: "Oracle Sans", "Oracle Headline", Arial, Helvetica, sans-serif;
+            background: linear-gradient(120deg, #f6f8f9 0%, #e7edf2 100%);
+            margin: 0;
+            color: #24292f;
+            min-height: 100vh;
         }
-        a {
-            text-decoration: none;
-            color: #005ca6;
-            cursor: pointer;
+        .container {
+            display: flex;
+            height: 100vh;
         }
-        a:hover {
-            color: #337ab7;
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            box-shadow: 2px 0 10px rgba(44,62,80,0.08);
+            padding: 0;
+            border-right: 1.5px solid #e0e7ef;
+            display: flex;
+            flex-direction: column;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        .sidebar .section-title {
+            padding: 20px 24px;
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #0057b8;
+            border: none;
+            background: none;
             text-align: left;
+            cursor: pointer;
+            transition: background .13s;
         }
-        th {
-            background-color: #f0f0f0;
+        .sidebar .section-title.active,
+        .sidebar .section-title:hover {
+            background-color: #f0f5fa;
         }
-        .section {
-            margin: 20px;
-            padding: 20px;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .main-content {
+            flex: 1;
+            padding: 36px;
+            background: transparent;
+            overflow: auto;
+        }
+        .section-content {
+            display: none;
+        }
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.19s;
         }
         .logo {
             text-align: center;
-            margin: 20px;
+            margin: 34px auto 14px auto;
         }
         .logo img {
-            width: 200px;
+            width: 180px;
             height: auto;
+            filter: drop-shadow(0 3px 14px rgba(44, 62, 80, 0.08));
         }
-        .hidden {
-            display: none;
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            background: #fafbfc;
+            margin-bottom: 32px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1.5px 4px rgba(110, 118, 129, 0.05);
+        }
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+        }
+        th {
+            background-color: #eff3fb;
+            color: #0057b8;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        tr {
+            transition: background .2s;
+        }
+        tr:nth-child(even) {
+            background-color: #f5f7fa;
+        }
+        tr:hover {
+            background-color: #e6f0fa;
+        }
+        @media (max-width: 880px) {
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; flex-direction: row; border-right: none; border-bottom: 1.5px solid #e0e7ef; }
+            .sidebar .section-title { flex: 1; font-size: 1em; padding: 14px 8px; text-align: center; }
+            .main-content { padding: 9vw 1vw; }
+        }
+        @media (max-width: 700px) {
+            .main-content { padding: 14px 1vw; }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -52,263 +108,275 @@
     <div class="logo">
         <img src="fedora_logo.svg" alt="Oracle Linux Virtualization Manager Logo">
     </div>
-    <div class="section">
-        <h3><a onclick="toggleSection('general-info')">General Information</a></h3>
-        <div id="general-info" class="hidden">
-            <table>
-                <tr>
-                    <th>Category</th>
-                    <th>Count</th>
-                    <th>Names</th>
-                </tr>
-                <tr>
-                    <td>KVM Hosts</td>
-                    <td>{{ hosts_info.ovirt_hosts | length }}</td>
-                    <td>
-                        {% if hosts_info.ovirt_hosts %}
-                            {{ hosts_info.ovirt_hosts | map(attribute='name') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Hosts in Maintenance</td>
-                    <td>{{ hosts_in_maintenance }}</td>
-                    <td>
-                        {% if hosts_maintenance_list %}
-                            {{ hosts_maintenance_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Hosts Non Responsive</td>
-                    <td>{{ hosts_non_responsive }}</td>
-                    <td>
-                        {% if hosts_non_responsive_list %}
-                            {{ hosts_non_responsive_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Hosts Non Operational</td>
-                    <td>{{ hosts_non_operational }}</td>
-                    <td>
-                        {% if hosts_non_operational_list %}
-                            {{ hosts_non_operational_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Storage Domains</td>
-                    <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
-                    <td>
-                        {% if storage_domains_info.ovirt_storage_domains %}
-                            {{ storage_domains_info.ovirt_storage_domains | map(attribute='name') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Clusters</td>
-                    <td>{{ clusters_info.ovirt_clusters | length }}</td>
-                    <td>
-                        {% if clusters_info.ovirt_clusters %}
-                            {{ clusters_info.ovirt_clusters | map(attribute='name') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Templates</td>
-                    <td>{{ templates_info.ovirt_templates | length }}</td>
-                    <td>
-                        {% if templates_info.ovirt_templates %}
-                            {{ templates_info.ovirt_templates | map(attribute='name') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Virtual Machines</td>
-                    <td>{{ vms_info.ovirt_vms | length }}</td>
-                    <td>
-                        {% if vms_info.ovirt_vms %}
-                            {{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Active VMs</td>
-                    <td>{{ active_vms }}</td>
-                    <td>
-                        {% if active_vms_list %}
-                            {{ active_vms_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Inactive VMs</td>
-                    <td>{{ inactive_vms }}</td>
-                    <td>
-                        {% if inactive_vms_list %}
-                            {{ inactive_vms_list | join(', ') }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-            <br>
-            <table>
-                <tr>
-                    <th>Attribute</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <td>Self Hosted Engine Deployment</td>
-                    <td>{{ 'YES' if self_hosted_engine else 'NO' }}</td>
-                </tr>
-                <tr>
-                    <td>OLVM Version</td>
-                    <td>{{ olvm_version }}</td>
-                </tr>
-            </table>
+    <div class="container">
+        <div class="sidebar">
+            <button class="section-title active" onclick="showSection('general-info')">General Information</button>
+            <button class="section-title" onclick="showSection('cluster-info')">Cluster Information</button>
+            <button class="section-title" onclick="showSection('storage-info')">Storage</button>
+            <button class="section-title" onclick="showSection('vm-info')">Virtual Machines</button>
+            <button class="section-title" onclick="showSection('host-info')">Host Information</button>
         </div>
-        <h3><a onclick="toggleSection('cluster-info')">Cluster Information</a></h3>
-        <div id="cluster-info" class="hidden">
-            <h3>Clusters with compatibility version 4.7</h3>
-            <table>
-                <tr>
-                    <th>Name</th>
-                </tr>
-                {% for cluster in clusters_47 %}
-                <tr>
-                    <td>{{ cluster.name }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <h3><a onclick="toggleSection('storage-info')">Storage</a></h3>
-        <div id="storage-info" class="hidden">
-            <table>
-                <tr>
-                    <th>Storage Domain Name</th>
-                    <th>Storage Domain Type</th>
-                    <th>Number of Disks</th>
-                    <th>% Used</th>
-                </tr>
-                {% for sd in storage_domains_info.ovirt_storage_domains %}
-                <tr>
-                    <td>{{ sd.name }}</td>
-                    <td>{{ sd.type }}</td>
-                    {% if sd.disks is defined %}
-                    <td>{{ sd.disks | length }}</td>
-                    {% else %}
-                    <td>N/A</td>
-                    {% endif %}
-                    {% if sd.used is defined and sd.available is defined %}
-                    <td>{{ ((sd.used / (sd.used + sd.available)) * 100) | round(2) }}%</td>
-                    {% else %}
-                    <td>N/A</td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <h3><a onclick="toggleSection('vm-info')">Virtual Machines</a></h3>
-        <div id="vm-info" class="hidden">
-            <table>
-                <tr>
-                    <th>Category</th>
-                    <th>Count</th>
-                </tr>
-                <tr>
-                    <td>Total Virtual Machines</td>
-                    <td>{{ vms_info.ovirt_vms | length }}</td>
-                </tr>
-                <tr>
-                    <td>VMs Up</td>
-                    <td>{{ active_vms }}</td>
-                </tr>
-                <tr>
-                    <td>VMs Created Last Month</td>
-                    <td>{{ vms_created_last_month }}</td>
-                </tr>
-                <tr>
-                    <td>VMs in Shutdown State</td>
-                    <td>{{ inactive_vms }}</td>
-                </tr>
-            </table>
-        </div>
-        <h3><a onclick="toggleSection('host-info')">Host Information</a></h3>
-        <div id="host-info" class="hidden">
-            <h3>Hosts and their CPU Models</h3>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>CPU Model</th>
-                    <th>CPU Type</th>
-                    <th>Number of CPUs</th>
-                    <th>Manufacturer</th>
-                    <th>VDSM Version</th>
-                </tr>
-                {% for host in hosts_info.ovirt_hosts %}
-                <tr>
-                    <td>{{ host.name }}</td>
-                    <td>{{ host.cpu.name }}</td>
-                    <td>{{ host.cpu.type | default('N/A') }}</td>
-                    <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
-                    <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
-                    <td>{{ host.version.full_version | default('N/A') }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <div class="main-content">
+            <div id="general-info" class="section-content active">
+                <!-- General Information Table -->
+                <table>
+                    <tr>
+                        <th>Category</th>
+                        <th>Count</th>
+                        <th>Names</th>
+                    </tr>
+                    <tr>
+                        <td>KVM Hosts</td>
+                        <td>{{ hosts_info.ovirt_hosts | length }}</td>
+                        <td>
+                            {% if hosts_info.ovirt_hosts %}
+                                {{ hosts_info.ovirt_hosts | map(attribute='name') | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hosts in Maintenance</td>
+                        <td>{{ hosts_in_maintenance }}</td>
+                        <td>
+                            {% if hosts_maintenance_list %}
+                                {{ hosts_maintenance_list | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hosts Non Responsive</td>
+                        <td>{{ hosts_non_responsive }}</td>
+                        <td>
+                            {% if hosts_non_responsive_list %}
+                                {{ hosts_non_responsive_list | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hosts Non Operational</td>
+                        <td>{{ hosts_non_operational }}</td>
+                        <td>
+                            {% if hosts_non_operational_list %}
+                                {{ hosts_non_operational_list | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Storage Domains</td>
+                        <td>{{ storage_domains_info.ovirt_storage_domains | length }}</td>
+                        <td>
+                            {% if storage_domains_info.ovirt_storage_domains %}
+                                {{ storage_domains_info.ovirt_storage_domains | map(attribute='name') | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Clusters</td>
+                        <td>{{ clusters_info.ovirt_clusters | length }}</td>
+                        <td>
+                            {% if clusters_info.ovirt_clusters %}
+                                {{ clusters_info.ovirt_clusters | map(attribute='name') | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Templates</td>
+                        <td>{{ templates_info.ovirt_templates | length }}</td>
+                        <td>
+                            {% if templates_info.ovirt_templates %}
+                                {{ templates_info.ovirt_templates | map(attribute='name') | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Virtual Machines</td>
+                        <td>{{ vms_info.ovirt_vms | length }}</td>
+                        <td>
+                            {% if vms_info.ovirt_vms %}
+                                {{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Active VMs</td>
+                        <td>{{ active_vms }}</td>
+                        <td>
+                            {% if active_vms_list %}
+                                {{ active_vms_list | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Inactive VMs</td>
+                        <td>{{ inactive_vms }}</td>
+                        <td>
+                            {% if inactive_vms_list %}
+                                {{ inactive_vms_list | join(', ') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Self Hosted Engine Deployment</td>
+                        <td>{{ 'YES' if self_hosted_engine else 'NO' }}</td>
+                    </tr>
+                    <tr>
+                        <td>OLVM Version</td>
+                        <td>{{ olvm_version }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="cluster-info" class="section-content">
+                <h3>Clusters with compatibility version 4.7</h3>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                    </tr>
+                    {% for cluster in clusters_47 %}
+                    <tr>
+                        <td>{{ cluster.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div id="storage-info" class="section-content">
+                <table>
+                    <tr>
+                        <th>Storage Domain Name</th>
+                        <th>Storage Domain Type</th>
+                        <th>Number of Disks</th>
+                        <th>% Used</th>
+                    </tr>
+                    {% for sd in storage_domains_info.ovirt_storage_domains %}
+                    <tr>
+                        <td>{{ sd.name }}</td>
+                        <td>{{ sd.type }}</td>
+                        {% if sd.disks is defined %}
+                        <td>{{ sd.disks | length }}</td>
+                        {% else %}
+                        <td>N/A</td>
+                        {% endif %}
+                        {% if sd.used is defined and sd.available is defined %}
+                        <td>{{ ((sd.used / (sd.used + sd.available)) * 100) | round(2) }}%</td>
+                        {% else %}
+                        <td>N/A</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div id="vm-info" class="section-content">
+                <table>
+                    <tr>
+                        <th>Category</th>
+                        <th>Count</th>
+                    </tr>
+                    <tr>
+                        <td>Total Virtual Machines</td>
+                        <td>{{ vms_info.ovirt_vms | length }}</td>
+                    </tr>
+                    <tr>
+                        <td>VMs Up</td>
+                        <td>{{ active_vms }}</td>
+                    </tr>
+                    <tr>
+                        <td>VMs Created Last Month</td>
+                        <td>{{ vms_created_last_month }}</td>
+                    </tr>
+                    <tr>
+                        <td>VMs in Shutdown State</td>
+                        <td>{{ inactive_vms }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="host-info" class="section-content">
+                <h3>Hosts and their CPU Models</h3>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>CPU Model</th>
+                        <th>CPU Type</th>
+                        <th>Number of CPUs</th>
+                        <th>Manufacturer</th>
+                        <th>VDSM Version</th>
+                    </tr>
+                    {% for host in hosts_info.ovirt_hosts %}
+                    <tr>
+                        <td>{{ host.name }}</td>
+                        <td>{{ host.cpu.name }}</td>
+                        <td>{{ host.cpu.type | default('N/A') }}</td>
+                        <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
+                        <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
+                        <td>{{ host.version.full_version | default('N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
 
-            <h3>Host OS &amp; Security Configuration</h3>
-            <table>
-                <tr>
-                    <th>Host</th>
-                    <th>Status</th>
-                    <th>SELinux Mode</th>
-                    <th>Kernel Cmdline</th>
-                    <th>Kdump</th>
-                </tr>
-                {% for host in hosts_info.ovirt_hosts %}
-                <tr>
-                    <td>{{ host.name }}</td>
-                    <td>{{ host.status | default('N/A') }}</td>
-                    <td>{{ host.se_linux.mode | default('N/A') }}</td>
-                    <td>{{ host.os.reported_kernel_cmdline | default('N/A') }}</td>
-                    <td>{{ host.kdump_status | default('N/A') }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+                <h3>Host OS &amp; Security Configuration</h3>
+                <table>
+                    <tr>
+                        <th>Host</th>
+                        <th>Status</th>
+                        <th>SELinux Mode</th>
+                        <th>Kernel Cmdline</th>
+                        <th>Kdump</th>
+                    </tr>
+                    {% for host in hosts_info.ovirt_hosts %}
+                    <tr>
+                        <td>{{ host.name }}</td>
+                        <td>{{ host.status | default('N/A') }}</td>
+                        <td>{{ host.se_linux.mode | default('N/A') }}</td>
+                        <td>{{ host.os.reported_kernel_cmdline | default('N/A') }}</td>
+                        <td>{{ host.kdump_status | default('N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
     </div>
     <script>
-        function toggleSection(id) {
-            var section = document.getElementById(id);
-            if (section) {
-                if (section.classList.contains('hidden')) {
-                    section.classList.remove('hidden');
-                } else {
-                    section.classList.add('hidden');
-                }
+        function showSection(sectionId) {
+            // Remove active class from all sidebar buttons
+            document.querySelectorAll('.section-title').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            // Remove active from all content areas
+            document.querySelectorAll('.section-content').forEach(function(sec) {
+                sec.classList.remove('active');
+            });
+            // Add active to the clicked sidebar button
+            var sidebarIndex = ['general-info', 'cluster-info', 'storage-info', 'vm-info', 'host-info']
+                .indexOf(sectionId);
+            if (sidebarIndex >= 0) {
+                document.querySelectorAll('.section-title')[sidebarIndex].classList.add('active');
             }
+            // Show the selected content area
+            document.getElementById(sectionId).classList.add('active');
         }
     </script>
 </body>
