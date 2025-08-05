@@ -213,7 +213,12 @@
              )
           }}
 
- 
+
+    - debug:
+        msg: "Hosts: {{ hosts_info.ovirt_hosts }}"
+    - debug:
+        msg: "VMs: {{ vms_info.ovirt_vms }}"
+     
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
