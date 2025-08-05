@@ -82,6 +82,11 @@
         fetch_nested: true
       register: templates_info
 
+    - name: Gather all datacenters
+      ovirt_datacenter_info:
+        auth: "{{ ovirt_auth }}"
+      register: datacenters_info 
+
     #####################
     # NETWORK ANALYTICS #
     #####################
