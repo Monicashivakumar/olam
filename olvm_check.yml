@@ -34,6 +34,18 @@
           - statistics
       register: hosts_info
 
+    - name: Inspect one host object
+      debug:
+        var: hosts_info.ovirt_hosts[0]
+    
+    - name: Check if statistics key present for each host
+      debug:
+        msg: |
+          Host: {{ item.name | default('N/A') }}
+          Statistics present: {{ 'statistics' in item }}
+          Statistics value: {{ item.statistics | default('Not Provided') }}
+      loop: "{{ hosts_info.ovirt_hosts }}"
+
     - name: Get events
       ovirt_event_info:
         auth: "{{ ovirt_auth }}"
