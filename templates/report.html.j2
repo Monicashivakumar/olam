@@ -300,11 +300,11 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if net.data_center is defined and net.data_center.id is defined and datacenter_id_to_name is defined and net.data_center.id in datacenter_id_to_name %}
-                            {{ datacenter_id_to_name[net.data_center.id] }}
-                        {% else %}
-                            N/A
-                        {% endif %}
+                      {% if net.data_center is defined and net.data_center.id is defined and datacenter_id_to_name is defined and net.data_center.id in datacenter_id_to_name %}
+                        {{ datacenter_id_to_name[net.data_center.id] }}
+                      {% else %}
+                        N/A
+                      {% endif %}
                     </td>
                     <td>
                         {% if net.vlan is defined and net.vlan.id is defined %}
