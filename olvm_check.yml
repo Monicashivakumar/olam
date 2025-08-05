@@ -213,26 +213,33 @@
              )
           }}
 
-    - name: Map cluster ID to host count (clean and safe)
+    - name: Map cluster ID to host count (fixed and robust)
       set_fact:
-          cluster_id_to_host_count: >-
-            {{
-              dict(
+        cluster_id_to_host_count: >-
+          {{
+            dict(
+              (
                 hosts_info.ovirt_hosts
                 | selectattr('cluster', 'defined')
                 | selectattr('cluster.id', 'defined')
                 | groupby('cluster.id')
-                | map('extract', [0])  
-                | zip(
+                | list  
+              )
+              | map('extract', 0)  
+              | zip(
+                  (
                     hosts_info.ovirt_hosts
                     | selectattr('cluster', 'defined')
                     | selectattr('cluster.id', 'defined')
                     | groupby('cluster.id')
-                    | map('extract', [1])  
-                    | map('length')
-                )
+                    | list 
+                  )
+                  | map('extract', 1)  
+                  | map('length')    
               )
-            }}
+            )
+          }}
+
 
 
 
