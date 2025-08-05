@@ -195,59 +195,30 @@
             <th>Gluster Service</th>
             <th>Ha Reservation</th>
             <th>Mgmt Network</th>
-    
+            <th>Policy</th>
           </tr>
-          {% if clusters_info.ovirt_clusters is defined and clusters_info.ovirt_clusters | length > 0 %}
           {% for cluster in clusters_info.ovirt_clusters %}
-            <tr>
-              <td>{{ cluster.name if cluster.name is defined else 'N/A' }}</td>
-              <td>
-                {% if cluster.cpu is defined and cluster.cpu.type is defined %}
-                  {{ cluster.cpu.type }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.version is defined and cluster.version.major is defined and cluster.version.minor is defined %}
-                  {{ cluster.version.major }}.{{ cluster.version.minor }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.data_center is defined and cluster.data_center.name is defined %}
-                  {{ cluster.data_center.name }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.management_network is defined and cluster.management_network.name is defined %}
-                  {{ cluster.management_network.name }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.id is defined %}
-                  {{ cluster_id_to_host_count[cluster.id] | default(0) }}
-                {% else %}
-                  0
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.id is defined %}
-                  {{ cluster_id_to_vm_count[cluster.id] | default(0) }}
-                {% else %}
-                  0
-                {% endif %}
-              </td>
-            </tr>
+          <tr>
+            <td>{{ cluster.name }}</td>
+            <td>
+              {% if cluster.cpu is defined and cluster.cpu.type is defined %}
+                {{ cluster.cpu.type }}
+              {% else %}N/A{% endif %}
+            </td>
+            <td>{{ cluster.version.major }}.{{ cluster.version.minor }}</td>
+            <td><!-- Count hosts with host.cluster.id == cluster.id --></td>
+            <td><!-- Count VMs with vm.cluster.id == cluster.id --></td>
+            <td>{% if cluster.networks is defined %}{{ cluster.networks | length }}{% else %}N/A{% endif %}</td>
+            <td>{{ cluster.status | default('N/A') }}</td>
+            <td>{{ cluster.virt_service | default('N/A') }}</td>
+            <td>{{ cluster.gluster_service | default('N/A') }}</td>
+            <td>
+              {% if cluster.ha_reservation is defined %}{{ 'Yes' if cluster.ha_reservation else 'No' }}{% else %}N/A{% endif %}
+            </td>
+            <td><!-- Management network name if present --></td>
+            <td>{{ cluster.scheduling_policy | default('Default') }}</td>
+          </tr>
           {% endfor %}
-        {% else %}
-          <tr><td colspan="8">No cluster information available.</td></tr>
-        {% endif %}
         </table>
         </div>
         <div id="storage-info" class="section-content">
