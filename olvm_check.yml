@@ -165,6 +165,7 @@
         oracle_linux_8_vms_list: >-
           {{ vms_info.ovirt_vms
              | selectattr('os.type', 'defined')
+             | selectattr('os.type', 'search', '^Oracle Linux 8.x')
              | selectattr('os.type', 'match', '(?i)oracle linux 8\\.x')
              | map(attribute='name')
              | list }}
@@ -214,12 +215,6 @@
           }}
 
  
-
-    - debug:
-        msg: "Hosts: {{ hosts_info.ovirt_hosts }}"
-    - debug:
-        msg: "VMs: {{ vms_info.ovirt_vms }}"
-     
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
