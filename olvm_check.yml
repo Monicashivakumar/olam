@@ -235,19 +235,6 @@
             )
           }}
 
-    - name: Map cluster ID to VM count
-      set_fact:
-        cluster_id_to_vm_count: >-
-          {{
-            vms_info.ovirt_vms
-            | selectattr('cluster', 'defined')
-            | selectattr('cluster.id', 'defined')
-            | groupby('cluster.id')
-            | map('reverse')
-            | list
-            | items2dict
-          }}
-
     - debug:
         msg: "Hosts: {{ hosts_info.ovirt_hosts }}"
     - debug:
