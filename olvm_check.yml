@@ -182,7 +182,28 @@
                 )
              )
           }}
-
+    - name: Build network name to VM name mapping
+      set_fact:
+        net_to_vms: >-
+          {{
+            dict(
+              networks_info.ovirt_networks | map(attribute='name') | zip(
+                networks_info.ovirt_networks | map('extract', vms_info.ovirt_vms | map('list', attribute='nics') | sum(start=[])) | map('selectattr', 'network.name', 'equalto', item) | map('map', attribute='name') | map('list') | list
+              )
+            )
+          }}
+    
+    - name: Build network name to Host name mapping
+      set_fact:
+        net_to_hosts: >-
+          {{
+            dict(
+              networks_info.ovirt_networks | map(attribute='name') | zip(
+                networks_info.ovirt_networks | map('extract', hosts_info.ovirt_hosts | map('list', attribute='nics') | sum(start=[])) | map('selectattr', 'network.name', 'equalto', item) | map('map', attribute='name') | map('list') | list
+              )
+            )
+          }}
+ 
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
@@ -216,6 +237,9 @@
         self_hosted_engine: "{{ self_hosted_engine }}"
         olvm_version: "{{ olvm_version }}"
         datacenter_id_to_name: "{{ datacenter_id_to_name }}"
+        net_to_vms: "{{ net_to_vms }}"
+        net_to_hosts: "{{ net_to_hosts }}"
+        
 
     - name: Logout from OLVM
       ovirt_auth:
