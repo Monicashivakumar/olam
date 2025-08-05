@@ -360,7 +360,7 @@
                     <th>VDSM Version</th>
                     <th>Power Mgmt Enabled</th>
                     <th>Libvirt Version</th>
-                    <th>KVM Version</th>
+                    <th>OS Version</th>
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
@@ -381,7 +381,11 @@
                         {{ host.libvirt_version.full_version if host.libvirt_version is defined and host.libvirt_version.full_version is defined else 'N/A' }}
                     </td>
                     <td>
-                        {{ host.kvm_version.full_version if host.kvm_version is defined and host.kvm_version.full_version is defined else 'N/A' }}
+                        {% if host.os is defined and host.os.version is defined and host.os.version.full_version is defined %}
+                            {{ host.os.version.full_version }}
+                        {% else %}
+                            N/A
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
