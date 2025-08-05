@@ -351,16 +351,17 @@
                 <th>Manufacturer</th>
                 <th>VDSM Version</th>
                 <th>Power Mgmt Enabled</th>
-                <th>Free RAM (GB)</th>
+                <th>Libvirt Version</th>
+                <th>KVM Version</th>
             </tr>
             {% for host in hosts_info.ovirt_hosts %}
             <tr>
                 <td>{{ host.name | default('N/A') }}</td>
-                <td>{{ host.cpu.name | default('N/A') if host.cpu is defined and host.cpu.name is defined else 'N/A' }}</td>
-                <td>{{ host.cpu.type | default('N/A') if host.cpu is defined and host.cpu.type is defined else 'N/A' }}</td>
-                <td>{{ host.cpu.topology.cores | default('N/A') if host.cpu is defined and host.cpu.topology is defined and host.cpu.topology.cores is defined else 'N/A' }}</td>
-                <td>{{ host.hardware_information.manufacturer | default('N/A') if host.hardware_information is defined and host.hardware_information.manufacturer is defined else 'N/A' }}</td>
-                <td>{{ host.version.full_version | default('N/A') if host.version is defined and host.version.full_version is defined else 'N/A' }}</td>
+                <td>{{ host.cpu.name if host.cpu is defined and host.cpu.name is defined else 'N/A' }}</td>
+                <td>{{ host.cpu.type if host.cpu is defined and host.cpu.type is defined else 'N/A' }}</td>
+                <td>{{ host.cpu.topology.cores if host.cpu is defined and host.cpu.topology is defined and host.cpu.topology.cores is defined else 'N/A' }}</td>
+                <td>{{ host.hardware_information.manufacturer if host.hardware_information is defined and host.hardware_information.manufacturer is defined else 'N/A' }}</td>
+                <td>{{ host.version.full_version if host.version is defined and host.version.full_version is defined else 'N/A' }}</td>
                 <td>
                     {% if host.power_management is defined and host.power_management.enabled is defined %}
                         {{ 'Yes' if host.power_management.enabled else 'No' }}
@@ -369,14 +370,15 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% set free_mem_stat = (host.statistics | selectattr('name', 'equalto', 'memory.free') | first) if host.statistics is defined else None %}
-                    {% if free_mem_stat and free_mem_stat.values and free_mem_stat.values[0].datum is defined %}
-                        {{ (free_mem_stat.values[0].datum / 1073741824) | round(2) }}
-                    {% else %}
-                        N/A
-                    {% endif %}
+                    {{ host.libvirt_version.full_version if host.libvirt_version is defined and host.libvirt_version.full_version is defined else 'N/A' }}
+                </td>
+                <td>
+                    {{ host.kvm_version.full_version if host.kvm_version is defined and host.kvm_version.full_version is defined else 'N/A' }}
                 </td>
             </tr>
+            {% endfor %}
+        </table>
+        
             {% endfor %}
         </table>
             <h3>Host OS &amp; Security Configuration</h3>
