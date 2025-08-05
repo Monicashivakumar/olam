@@ -167,6 +167,18 @@
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
 
+    - name: Build datacenter_id_to_name mapping
+      set_fact:
+        datacenter_id_to_name: >-
+          {{
+             dict(
+                datacenters_info.ovirt_datacenters | selectattr('id', 'defined') | map(attribute='id') | zip(
+                  datacenters_info.ovirt_datacenters | selectattr('name', 'defined') | map(attribute='name')
+                )
+             )
+          }}
+`
+
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
