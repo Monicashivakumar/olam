@@ -222,7 +222,7 @@
               | selectattr('cluster', 'defined')
               | selectattr('cluster.id', 'defined')
               | groupby('cluster.id')
-              | map('extract', [0, 'id'])  # extract cluster.id
+              | map('extract', [0, 'id']) 
               | zip(
                   hosts_info.ovirt_hosts
                   | selectattr('cluster', 'defined')
