@@ -15,6 +15,7 @@
       tags:
         - always
 
+    # Gather KVM hosts with all network-relevant attributes
     - name: Get number of KVM hosts
       ovirt_host_info:
         auth: "{{ ovirt_auth }}"
@@ -27,8 +28,10 @@
           - kdump_status
           - selinux
           - version
+          - nics
+          - bonds
+          - network_attachments
       register: hosts_info
-
 
     - name: Get events
       ovirt_event_info:
@@ -43,14 +46,18 @@
           - data_center
       register: storage_domains_info
 
+    # All logical networks with full details; includes VLAN, usages, provider, etc.
     - name: Gather all networks
       ovirt_network_info:
         auth: "{{ ovirt_auth }}"
         fetch_nested: true
         nested_attributes:
           - data_center
+          - vlan
+          - usages
+          - mtu
+          - external_provider
       register: networks_info
- 
 
     - name: Get number of VMs
       ovirt_vm_info:
@@ -62,6 +69,7 @@
       ovirt_cluster_info:
         auth: "{{ ovirt_auth }}"
         fetch_nested: true
+        nested_attributes: [ networks ]
       register: clusters_info
 
     - name: Get number of templates
@@ -69,6 +77,28 @@
         auth: "{{ ovirt_auth }}"
         fetch_nested: true
       register: templates_info
+
+    #####################
+    # NETWORK ANALYTICS #
+    #####################
+    - name: Set external networks list (with provider)
+      set_fact:
+        external_networks: >-
+          {{
+            networks_info.ovirt_networks
+            | selectattr('external_provider', 'defined')
+            | selectattr('external_provider', '!=', None)
+            | list
+          }}
+
+    - name: Set orphan (unmanaged) networks list
+      set_fact:
+        orphan_networks: >-
+          {{
+            networks_info.ovirt_networks
+            | rejectattr('data_center', 'defined')
+            | list
+          }}
 
     # Generate lists and counts for hosts states
     - name: Get number and names of hosts in maintenance state
@@ -118,34 +148,20 @@
     - name: Detect if deployment is Self Hosted Engine
       set_fact:
         self_hosted_engine: "{{ 'HostedEngine' in (vms_info.ovirt_vms | map(attribute='name') | list) }}"
-        
+
     - name: Get OLVM Engine version with rpm
       command: "rpm -q --qf '%{VERSION}-%{RELEASE}\\n' ovirt-engine"
       register: olvm_version
       changed_when: false
       become: yes
-  
-    
+
     - name: Set OLVM version fact
       set_fact:
         olvm_version: "{{ olvm_version.stdout }}"
 
-    - name: Debug host.cpu
-      debug:
-        msg: "{{ hosts_info }}"
-
-    - name: Debug storage_domains_info
-      debug:
-        msg: "{{ storage_domains_info }}"
-
-    - name: Get current epoch time
-      set_fact:
-        current_epoch: "{{ lookup('pipe', 'date +%s') | int }}"
-
     - name: Get number of VMs created in the last 30 days
       set_fact:
         vms_created_last_month: "{{ vms_info.ovirt_vms | selectattr('creation_time', '>=', (lookup('pipe', 'date -d \"30 days ago\" +%Y-%m-%d'))) | list | length }}"
-
 
     - name: Generate HTML report
       template:
@@ -158,6 +174,9 @@
         vms_info: "{{ vms_info }}"
         clusters_info: "{{ clusters_info }}"
         templates_info: "{{ templates_info }}"
+        networks_info: "{{ networks_info }}"
+        external_networks: "{{ external_networks }}"
+        orphan_networks: "{{ orphan_networks }}"
         hosts_in_maintenance: "{{ hosts_in_maintenance }}"
         hosts_maintenance_list: "{{ hosts_maintenance_list }}"
         hosts_non_responsive: "{{ hosts_non_responsive }}"
