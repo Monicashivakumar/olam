@@ -199,6 +199,7 @@
         vms_created_last_month: "{{ vms_created_last_month }}"
         self_hosted_engine: "{{ self_hosted_engine }}"
         olvm_version: "{{ olvm_version }}"
+        datacenter_id_to_name: "{{ datacenter_id_to_name }}"
 
     - name: Logout from OLVM
       ovirt_auth:
