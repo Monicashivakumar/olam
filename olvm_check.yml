@@ -177,7 +177,6 @@
                 )
              )
           }}
-`
 
     - name: Generate HTML report
       template:
