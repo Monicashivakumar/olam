@@ -214,35 +214,74 @@
         </div>
         <div id="vm-info" class="section-content">
             <h3>Virtual Machines</h3>
+           <h3>Virtual Machines</h3>
             <table>
                 <tr>
                     <th>Category</th>
                     <th>Count</th>
+                    <th>List</th>
                 </tr>
                 <tr>
                     <td>Total Virtual Machines</td>
                     <td>{{ vms_info.ovirt_vms | length }}</td>
+                    <td>
+                        {% if vms_info.ovirt_vms %}
+                            {{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>VMs Up</td>
                     <td>{{ active_vms }}</td>
+                    <td>
+                        {% if active_vms_list %}
+                            {{ active_vms_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>VMs Created Last Month</td>
                     <td>{{ vms_created_last_month }}</td>
+                    <td>
+                        {% if vms_created_last_month_list %}
+                            {{ vms_created_last_month_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td>VMs in Shutdown State</td>
                     <td>{{ inactive_vms }}</td>
+                    <td>
+                        {% if inactive_vms_list %}
+                            {{ inactive_vms_list | join(', ') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
-                <td>VMs with HA Enabled</td>
-                <td colspan="1">
-                  {% if ha_enabled_vms_list %}
-                    {{ ha_enabled_vms_list | join(', ') }}
-                  {% else %}
-                    None
-                  {% endif %}
-                </td>
+                <tr>
+                    <td>VMs with HA Enabled</td>
+                    <td>
+                        {% if ha_enabled_vms_list %}
+                            {{ ha_enabled_vms_list | length }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ha_enabled_vms_list %}
+                            {{ ha_enabled_vms_list | join(', ') }}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </td>
+                </tr>
             </table>
         </div>
         <div id="host-info" class="section-content">
