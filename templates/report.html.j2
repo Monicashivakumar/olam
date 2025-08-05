@@ -182,9 +182,13 @@
         </div>
         <div id="cluster-info" class="section-content">
             <h3>Clusters with compatibility version 4.7</h3>
-            
+            <table>
+                <tr><th>Name</th></tr>
+                {% for cluster in clusters_47 %}
+                <tr><td>{{ cluster.name }}</td></tr>
+                {% endfor %}
+            </table>
         </div>
-          
         <div id="storage-info" class="section-content">
             <h3>Storage Domains</h3>
             <table>
@@ -209,6 +213,7 @@
             </table>
         </div>
         <div id="vm-info" class="section-content">
+            <h3>Virtual Machines</h3>
            <h3>Virtual Machines</h3>
             <table>
                 <tr>
