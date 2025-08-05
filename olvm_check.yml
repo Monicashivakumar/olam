@@ -221,7 +221,17 @@
             | selectattr('cluster', 'defined')
             | selectattr('cluster.id', 'defined')
             | groupby('cluster.id')
-            | map('reverse')
+            | map('first')  # gives cluster_id
+            | zip(
+                hosts_info.ovirt_hosts
+                | selectattr('cluster', 'defined')
+                | selectattr('cluster.id', 'defined')
+                | groupby('cluster.id')
+                | map('last')  # gives list of hosts per cluster
+                | map('length')
+            )
+            | map('zip', ['key', 'value'])
+            | map('community.general.dict_kv')
             | list
             | items2dict
           }}
