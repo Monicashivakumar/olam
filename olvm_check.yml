@@ -213,50 +213,7 @@
              )
           }}
 
-    - name: Map cluster ID to host count
-      set_fact:
-        cluster_id_to_host_count: >-
-          {{
-            dict(
-              hosts_info.ovirt_hosts
-              | selectattr('cluster', 'defined')
-              | selectattr('cluster.id', 'defined')
-              | map(attribute='cluster.id')
-              | list
-              | unique
-              | zip(
-                  hosts_info.ovirt_hosts
-                  | selectattr('cluster', 'defined')
-                  | selectattr('cluster.id', 'defined')
-                  | groupby('cluster.id')
-                  | map('last')
-                  | map('length')
-              )
-            )
-          }}
-
-    - name: Map cluster ID to VM count
-      set_fact:
-        cluster_id_to_vm_count: >-
-          {{
-            dict(
-              vms_info.ovirt_vms
-              | selectattr('cluster', 'defined')
-              | selectattr('cluster.id', 'defined')
-              | map(attribute='cluster.id')
-              | list
-              | unique
-              | zip(
-                  vms_info.ovirt_vms
-                  | selectattr('cluster', 'defined')
-                  | selectattr('cluster.id', 'defined')
-                  | groupby('cluster.id')
-                  | map('last')
-                  | map('length')
-              )
-            )
-          }}
-
+ 
 
     - debug:
         msg: "Hosts: {{ hosts_info.ovirt_hosts }}"
@@ -299,9 +256,9 @@
         ha_enabled_vms_list: "{{ ha_enabled_vms_list }}"
         vms_created_last_month_list: "{{ vms_created_last_month_list }}"
         oracle_linux_8_vms_list: "{{ oracle_linux_8_vms_list }}"
-        cluster_id_to_host_count: "{{ cluster_id_to_host_count }}"
-        cluster_id_to_vm_count: "{{ cluster_id_to_vm_count }}"
-        
+
+
+
     - name: Logout from OLVM
       ovirt_auth:
         state: absent
