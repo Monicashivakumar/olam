@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -213,11 +214,12 @@
               {% endif %}
             </td>
             <td>
-              {% if cluster.networks is defined %}
-                {{ cluster.networks | map(attribute='name', default='N/A') | join(', ') }}
+              {% if cluster.networks is defined and cluster.networks|length > 0 %}
+                {{ cluster.networks | selectattr('name', 'defined') | map(attribute='name') | join(', ') }}
               {% else %}
                 N/A
               {% endif %}
+            </td>
             </td>
             <td>{{ cluster.status | default('N/A') }}</td>
             <td>{{ cluster.virt_service | default('N/A') }}</td>
