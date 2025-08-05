@@ -223,7 +223,25 @@
                 {% for sd in storage_domains_info.ovirt_storage_domains %}
                 <tr>
                     <td>{{ sd.name | default('N/A') }}</td>
-                    <td>{{ sd.type | default('N/A') }}</td>
+                    <td>
+                        {% if sd.type is defined %}
+                            {% if sd.type == 'nfs' %}
+                                NFS
+                            {% elif sd.type == 'nfs41' %}
+                                NFS 4.1
+                            {% elif sd.type == 'iscsi' %}
+                                iSCSI
+                            {% elif sd.type == 'fcp' %}
+                                Fibre Channel
+                            {% elif sd.type == 'glusterfs' %}
+                                GlusterFS
+                            {% else %}
+                                {{ sd.type }}
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                     {% if sd.disks is defined %}
                     <td>{{ sd.disks | length }}</td>
                     {% else %}<td>N/A</td>{% endif %}
