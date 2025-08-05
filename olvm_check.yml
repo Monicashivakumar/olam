@@ -221,13 +221,13 @@
             | selectattr('cluster', 'defined')
             | selectattr('cluster.id', 'defined')
             | groupby('cluster.id')
-            | map('first')  # gives cluster_id
+            | map('first')  
             | zip(
                 hosts_info.ovirt_hosts
                 | selectattr('cluster', 'defined')
                 | selectattr('cluster.id', 'defined')
                 | groupby('cluster.id')
-                | map('last')  # gives list of hosts per cluster
+                | map('last') 
                 | map('length')
             )
             | map('zip', ['key', 'value'])
