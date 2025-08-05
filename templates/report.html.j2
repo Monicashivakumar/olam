@@ -195,7 +195,7 @@
             <th>Gluster Service</th>
             <th>Ha Reservation</th>
             <th>Mgmt Network</th>
-            <th>Policy</th>
+    
           </tr>
           {% if clusters_info.ovirt_clusters is defined and clusters_info.ovirt_clusters | length > 0 %}
           {% for cluster in clusters_info.ovirt_clusters %}
@@ -218,13 +218,6 @@
               <td>
                 {% if cluster.data_center is defined and cluster.data_center.name is defined %}
                   {{ cluster.data_center.name }}
-                {% else %}
-                  N/A
-                {% endif %}
-              </td>
-              <td>
-                {% if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined %}
-                  {{ cluster.scheduling_policy.name }}
                 {% else %}
                   N/A
                 {% endif %}
