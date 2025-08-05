@@ -290,6 +290,8 @@
                 <td>
                     {% if vm.cluster is defined and vm.cluster.name is defined %}
                         {{ vm.cluster.name }}
+                    {% elif vm.cluster is defined and vm.cluster.id is defined %}
+                        {{ vm.cluster.id }}
                     {% else %}
                         N/A
                     {% endif %}
@@ -297,6 +299,8 @@
                 <td>
                     {% if vm.template is defined and vm.template.name is defined %}
                         {{ vm.template.name }}
+                    {% elif vm.template is defined and vm.template.id is defined %}
+                        {{ vm.template.id }}
                     {% else %}
                         N/A
                     {% endif %}
