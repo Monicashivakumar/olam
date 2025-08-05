@@ -235,6 +235,14 @@
                     <td>VMs in Shutdown State</td>
                     <td>{{ inactive_vms }}</td>
                 </tr>
+                <td>VMs with HA Enabled</td>
+                <td colspan="1">
+                  {% if ha_enabled_vms_list %}
+                    {{ ha_enabled_vms_list | join(', ') }}
+                  {% else %}
+                    None
+                  {% endif %}
+                </td>
             </table>
         </div>
         <div id="host-info" class="section-content">
