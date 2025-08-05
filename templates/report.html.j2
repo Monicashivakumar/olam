@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Oracle Linux Virtualization Manager Report</title>
-    <link rel="stylesheet" href="https://oracle.enterprise.slack.com//static.oracle.com/cdn/fnd/gallery/2507.0.2/images/iconfont/ojuxIconFont.min.css">
+    <link rel="stylesheet" href=https://oracle.enterprise.slack.com//static.oracle.com/cdn/fnd/gallery/2507.0.2/images/iconfont/ojuxIconFont.min.css>
     <style>
         body {
             font-family: "Oracle Sans", "Oracle Headline", Arial, Helvetica, sans-serif;
@@ -107,7 +107,7 @@
 </head>
 <body>
 <div class="logo">
-    <img src="https://docs.oracle.com/en/operating-systems/oracle-linux/obe-style-js/img/oracle_doc_logo.png" alt="Oracle Linux Virtualization Manager Logo">
+    <img src=https://docs.oracle.com/en/operating-systems/oracle-linux/obe-style-js/img/oracle_doc_logo.png alt="Oracle Linux Virtualization Manager Logo">
 </div>
 <div class="container">
     <div class="sidebar">
@@ -151,17 +151,17 @@
                 <tr>
                     <td>Clusters</td>
                     <td>{{ clusters_info.ovirt_clusters | length }}</td>
-                    <td>{% if clusters_info.ovirt_clusters %}{{ clusters_info.ovirt_clusters | map(attribute='name') | join(', ') }}{% else %}N/A{% endif %}</td>
+                    <td>{% if clusters_info.ovirt_clusters %}{{ clusters_info.ovirt_clusters | map(attribute='name', default='N/A') | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>Templates</td>
                     <td>{{ templates_info.ovirt_templates | length }}</td>
-                    <td>{% if templates_info.ovirt_templates %}{{ templates_info.ovirt_templates | map(attribute='name') | join(', ') }}{% else %}N/A{% endif %}</td>
+                    <td>{% if templates_info.ovirt_templates %}{{ templates_info.ovirt_templates | map(attribute='name', default='N/A') | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>Virtual Machines</td>
                     <td>{{ vms_info.ovirt_vms | length }}</td>
-                    <td>{% if vms_info.ovirt_vms %}{{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}{% else %}N/A{% endif %}</td>
+                    <td>{% if vms_info.ovirt_vms %}{{ vms_info.ovirt_vms | map(attribute='name', default='N/A') | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
                 <tr>
                     <td>Active VMs</td>
@@ -187,8 +187,6 @@
             <th>Name</th>
             <th>CPU Type</th>
             <th>Compat Ver</th>
-            <th>Hosts</th>
-            <th>VMs</th>
             <th>Networks</th>
             <th>Status</th>
             <th>Virt Service</th>
@@ -199,7 +197,7 @@
           </tr>
           {% for cluster in clusters_info.ovirt_clusters %}
           <tr>
-            <td>{{ cluster.name if cluster.name is defined else 'N/A' }}</td>
+            <td>{{ cluster.name if cluster is defined and cluster.name is defined else 'N/A' }}</td>
             <td>
               {% if cluster.cpu is defined and cluster.cpu.type is defined %}
                 {{ cluster.cpu.type }}
@@ -208,25 +206,31 @@
               {% endif %}
             </td>
             <td>
-              {% if cluster.version is defined %}
+              {% if cluster.version is defined and cluster.version.major is defined and cluster.version.minor is defined %}
                 {{ cluster.version.major }}.{{ cluster.version.minor }}
               {% else %}
                 N/A
               {% endif %}
             </td>
             <td>
-              {{ cluster.data_center.name if cluster.data_center is defined and cluster.data_center.name is defined else 'N/A' }}
+              {% if cluster.networks is defined %}
+                {{ cluster.networks | map(attribute='name', default='N/A') | join(', ') }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>{{ cluster.status | default('N/A') }}</td>
+            <td>{{ cluster.virt_service | default('N/A') }}</td>
+            <td>{{ cluster.gluster_service | default('N/A') }}</td>
+            <td>{{ cluster.ha_reservation | default('N/A') }}</td>
+            <td>
+              {{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}
             </td>
             <td>
               {{ cluster.scheduling_policy.name if cluster.scheduling_policy is defined and cluster.scheduling_policy.name is defined else 'N/A' }}
             </td>
-            <td>
-              {{ cluster.management_network.name if cluster.management_network is defined and cluster.management_network.name is defined else 'N/A' }}
-            </td>
-            <td>{{ cluster_id_to_host_count[cluster.id] | default(0) }}</td>
-            <td>{{ cluster_id_to_vm_count[cluster.id] | default(0) }}</td>
           </tr>
-        {% endfor %}
+          {% endfor %}
         </table>
         </div>
         <div id="storage-info" class="section-content">
@@ -240,12 +244,12 @@
                 </tr>
                 {% for sd in storage_domains_info.ovirt_storage_domains %}
                 <tr>
-                    <td>{{ sd.name }}</td>
-                    <td>{{ sd.type }}</td>
+                    <td>{{ sd.name | default('N/A') }}</td>
+                    <td>{{ sd.type | default('N/A') }}</td>
                     {% if sd.disks is defined %}
                     <td>{{ sd.disks | length }}</td>
                     {% else %}<td>N/A</td>{% endif %}
-                    {% if sd.used is defined and sd.available is defined %}
+                    {% if sd.used is defined and sd.available is defined and (sd.used + sd.available) > 0 %}
                     <td>{{ ((sd.used / (sd.used + sd.available)) * 100) | round(2) }}%</td>
                     {% else %}<td>N/A</td>{% endif %}
                 </tr>
@@ -253,7 +257,7 @@
             </table>
         </div>
         <div id="vm-info" class="section-content">
-           <h3>Virtual Machines</h3>
+            <h3>Virtual Machines</h3>
             <table>
                 <tr>
                     <th>Category</th>
@@ -265,7 +269,7 @@
                     <td>{{ vms_info.ovirt_vms | length }}</td>
                     <td>
                         {% if vms_info.ovirt_vms %}
-                            {{ vms_info.ovirt_vms | map(attribute='name') | join(', ') }}
+                            {{ vms_info.ovirt_vms | map(attribute='name', default='N/A') | join(', ') }}
                         {% else %}
                             N/A
                         {% endif %}
@@ -320,8 +324,8 @@
                             None
                         {% endif %}
                     </td>
-                    </tr>
-                    <tr>
+                </tr>
+                <tr>
                     <td>VMs with OS Oracle Linux 8.x</td>
                     <td>{{  oracle_linux_8_vms_list | length }}</td>
                     <td>
@@ -331,7 +335,6 @@
                             None
                         {% endif %}
                     </td>
-                </tr>
                 </tr>
             </table>
         </div>
@@ -348,12 +351,12 @@
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
-                    <td>{{ host.name }}</td>
-                    <td>{{ host.cpu.name }}</td>
-                    <td>{{ host.cpu.type | default('N/A') }}</td>
-                    <td>{{ host.cpu.topology.cores | default('N/A') }}</td>
-                    <td>{{ host.hardware_information.manufacturer | default('N/A') }}</td>
-                    <td>{{ host.version.full_version | default('N/A') }}</td>
+                    <td>{{ host.name | default('N/A') }}</td>
+                    <td>{{ host.cpu.name | default('N/A') if host.cpu is defined and host.cpu.name is defined else 'N/A' }}</td>
+                    <td>{{ host.cpu.type | default('N/A') if host.cpu is defined and host.cpu.type is defined else 'N/A' }}</td>
+                    <td>{{ host.cpu.topology.cores | default('N/A') if host.cpu is defined and host.cpu.topology is defined and host.cpu.topology.cores is defined else 'N/A' }}</td>
+                    <td>{{ host.hardware_information.manufacturer | default('N/A') if host.hardware_information is defined and host.hardware_information.manufacturer is defined else 'N/A' }}</td>
+                    <td>{{ host.version.full_version | default('N/A') if host.version is defined and host.version.full_version is defined else 'N/A' }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -368,10 +371,10 @@
                 </tr>
                 {% for host in hosts_info.ovirt_hosts %}
                 <tr>
-                    <td>{{ host.name }}</td>
+                    <td>{{ host.name | default('N/A') }}</td>
                     <td>{{ host.status | default('N/A') }}</td>
-                    <td>{{ host.se_linux.mode | default('N/A') }}</td>
-                    <td>{{ host.os.reported_kernel_cmdline | default('N/A') }}</td>
+                    <td>{{ host.se_linux.mode | default('N/A') if host.se_linux is defined and host.se_linux.mode is defined else 'N/A' }}</td>
+                    <td>{{ host.os.reported_kernel_cmdline | default('N/A') if host.os is defined and host.os.reported_kernel_cmdline is defined else 'N/A' }}</td>
                     <td>{{ host.kdump_status | default('N/A') }}</td>
                 </tr>
                 {% endfor %}
@@ -423,8 +426,7 @@
                 <tr><td colspan="5" style="text-align:center;color:#a6a6a6;font-style:italic;">No network data available</td></tr>
             {% endif %}
         </table>
-
-</div>
+        </div>
     </div>
 </div>
 <script>
