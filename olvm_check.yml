@@ -59,6 +59,10 @@
           - external_provider
       register: networks_info
 
+    - name: debug
+      debug:
+         var: networks_info.ovirt_networks
+
     - name: Get number of VMs
       ovirt_vm_info:
         auth: "{{ ovirt_auth }}"
