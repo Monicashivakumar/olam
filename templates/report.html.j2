@@ -357,19 +357,144 @@
                     </tr>
                     {% endfor %}
                 </table>
-                <h3>Networks</h3>
+                <h3>Network Information</h3>
+                <h4>Logical Networks</h4>
                 <table>
                     <tr>
-                        <th>Name</th><th>Data Center</th><th>VLAN ID</th><th>Usage</th>
+                        <th>Name</th>
+                        <th>Data Center</th>
+                        <th>VLAN ID</th>
+                        <th>Usage</th>
+                        <th>MTU</th>
+                        <th>External Provider</th>
                     </tr>
                     {% for net in networks_info.ovirt_networks %}
                     <tr>
                         <td>{{ net.name }}</td>
-                        <td>{{ net.data_center.name | default('N/A') }}</td>
-                        <td>{{ net.vlan.id | default('None') }}</td>
+                        <td>{{ net.data_center.name if net.data_center is defined else 'N/A' }}</td>
+                        <td>{% if net.vlan is defined %}{{ net.vlan.id }}{% else %}N/A{% endif %}</td>
+                        <td>{% if net.usages is defined %}{{ net.usages | join(', ') }}{% else %}N/A{% endif %}</td>
+                        <td>{{ net.mtu | default('Default') }}</td>
                         <td>
-                            {% if net.usages %}{{ net.usages | join(', ') }}{% else %}N/A{% endif %}
+                            {% if net.external_provider is defined and net.external_provider %}
+                                {{ net.external_provider.name | default('Yes') }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
                         </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                
+                <h4>Networks per Cluster</h4>
+                {% for cl in clusters_info.ovirt_clusters %}
+                    <b>Cluster: {{ cl.name }}</b>
+                    <table>
+                        <tr>
+                            <th>Network Name</th>
+                            <th>Usage</th>
+                        </tr>
+                        {% for net in cl.networks %}
+                        <tr>
+                            <td>{{ net.name }}</td>
+                            <td>
+                                {% if net.usages is defined %}
+                                    {{ net.usages | join(', ') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% endfor %}
+                
+                <h4>Networks per Host</h4>
+                {% for host in hosts_info.ovirt_hosts %}
+                    <b>Host: {{ host.name }}</b>
+                    <table>
+                        <tr>
+                            <th>NIC/Bond</th>
+                            <th>Type</th>
+                            <th>Network</th>
+                            <th>IP Address</th>
+                            <th>Status</th>
+                        </tr>
+                        {% for nic in host.nics %}
+                        <tr>
+                            <td>{{ nic.name }}</td>
+                            <td>NIC</td>
+                            <td>
+                                {% if nic.network is defined %}
+                                    {{ nic.network.name | default('N/A') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if nic.ip is defined %}
+                                    {{ nic.ip.address | default('N/A') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ nic.status | default('N/A') }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if host.bonds is defined %}
+                        {% for bond in host.bonds %}
+                        <tr>
+                            <td>{{ bond.name }}</td>
+                            <td>Bond</td>
+                            <td>
+                                {% if bond.network is defined %}
+                                    {{ bond.network.name | default('N/A') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>N/A</td>
+                            <td>{{ bond.status | default('N/A') }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </table>
+                    <b>Bonded Interfaces:</b>
+                    <ul>
+                        {% if host.bonds is defined %}
+                            {% for bond in host.bonds %}
+                                <li>{{ bond.name }} = {{ bond.slaves | join(', ') }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>None</li>
+                        {% endif %}
+                    </ul>
+                {% endfor %}
+                
+                <h4>External Networks / Providers</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Provider Name</th>
+                    </tr>
+                    {% for net in external_networks %}
+                    <tr>
+                        <td>{{ net.name }}</td>
+                        <td>{{ net.external_provider.name | default('N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                
+                <h4>Orphan/Unmanaged Networks</h4>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>VLAN ID</th>
+                    </tr>
+                    {% for net in orphan_networks %}
+                    <tr>
+                        <td>{{ net.name }}</td>
+                        <td>{% if net.vlan is defined %}{{ net.vlan.id }}{% else %}N/A{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </table>
