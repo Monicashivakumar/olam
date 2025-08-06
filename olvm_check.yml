@@ -292,6 +292,7 @@
         vms_created_last_month_list: "{{ vms_created_last_month_list }}"
         oracle_linux_8_vms_list: "{{ oracle_linux_8_vms_list }}"
         vms_with_snapshots: "{{ vms_with_snapshots }}"
+        vms_above_90_cpu_list: "{{ vms_above_90_cpu_list }}"
 
 
 
