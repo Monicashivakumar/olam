@@ -173,7 +173,7 @@
                     <td>{{ inactive_vms }}</td>
                     <td>{% if inactive_vms_list %}{{ inactive_vms_list | join(', ') }}{% else %}N/A{% endif %}</td>
                 </tr>
-                <tr>
+                 <tr>
                     <td>VMs with CPU Utilization above 90%</td>
                     <td>{{ vms_above_90_cpu_list | length }}</td>
                     <td>
@@ -184,6 +184,7 @@
                         {% endif %}
                     </td>
                 </tr>
+
             </table>
             <table>
                 <tr><th>Attribute</th><th>Value</th></tr>
