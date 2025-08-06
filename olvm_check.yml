@@ -182,6 +182,17 @@
              | map(attribute='name')
              | list }}
 
+    - name: List VMs with CPU utilization above 90%
+      set_fact:
+        vms_above_90_cpu_list: >-
+          {{
+            vms_info.ovirt_vms |
+            selectattr('statistics', 'defined') |
+            selectattr('statistics', 'select',
+              lambda stats: stats | selectattr('name', 'equalto', 'usage_cpu_percent') | selectattr('values.0', 'defined') | selectattr('values.0', '>', 90.0) | list | length > 0
+            ) | map(attribute='name') | list
+          }}
+
     # Clusters 4.7 compatibility
     - name: Get clusters with compatibility version 4.7
       set_fact:
