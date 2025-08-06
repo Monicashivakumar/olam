@@ -256,13 +256,22 @@
              )
           }}
 
- 
-
-    - debug:
-        msg: "Hosts: {{ hosts_info.ovirt_hosts }}"
-    - debug:
-        msg: "VMs: {{ vms_info.ovirt_vms }}"
-     
+    - name: Collect VMs with >90% CPU utilization
+      set_fact:
+        vms_above_90_cpu_list: "{{ vms_above_90_cpu_list + [item.name] }}"
+      loop: "{{ vms_info.ovirt_vms }}"
+      when: >
+        item.statistics is defined and
+        (
+          item.statistics
+          | selectattr('name', 'defined')
+          | selectattr('name', 'equalto', 'usage_cpu_percent')
+          | selectattr('values.0', 'defined')
+          | selectattr('values.0', '>', 90)
+          | list
+          | length > 0
+        )
+         
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
