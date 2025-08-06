@@ -68,9 +68,9 @@
       register: vms_info
 
     - name: Display vms_info variable with verbosity
-      ansible.builtin.debug:
+      debug:
         var: vms_info
-        verbosity: 2
+      
 
     # All logical networks with full details; includes VLAN, usages, provider, etc.
     - name: Gather all networks
