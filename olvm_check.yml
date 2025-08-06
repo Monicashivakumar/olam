@@ -185,21 +185,6 @@
     - name: Initialize high CPU list
       set_fact:
         vms_above_90_cpu_list: []
-    
-    - name: Collect VMs with >90% CPU utilization
-      set_fact:
-        vms_above_90_cpu_list: "{{ vms_above_90_cpu_list + [ item.name ] }}"
-      loop: "{{ vms_info.ovirt_vms }}"
-      when: >
-        item.statistics is defined and
-        (
-          item.statistics
-          | selectattr('name', 'equalto', 'usage_cpu_percent')
-          | selectattr('values.0', 'defined')
-          | selectattr('values.0', '>', 90)
-          | list
-          | length > 0
-        )
         
     # Clusters 4.7 compatibility
     - name: Get clusters with compatibility version 4.7
@@ -271,7 +256,7 @@
           | list
           | length > 0
         )
-         
+             
     - name: Generate HTML report
       template:
         src: templates/report.html.j2
