@@ -59,6 +59,20 @@
           - data_center
       register: storage_domains_info
 
+    - name: Gather VM information
+      ovirt.ovirt.ovirt_vm_info:
+        auth: "{{ ovirt_auth }}"
+        fetch_nested: true
+        nested_attributes:
+          - statistics
+      register: vms_info
+
+    - name: Gather VM statistics
+      ovirt.ovirt.ovirt_vm_statistics:
+        auth: "{{ ovirt_auth }}"
+        vm: vm5
+      register: vm_stats
+
     # All logical networks with full details; includes VLAN, usages, provider, etc.
     - name: Gather all networks
       ovirt_network_info:
